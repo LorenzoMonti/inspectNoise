@@ -33,7 +33,7 @@ class ConfigManager(object):
             }
 
             with open(USER_CONFIG, "w") as conf_file:
-                _config.write(conf_file)
+                self._config.write(conf_file)
 
         # If configuration file already exist in user dir. read it.
         else:
@@ -58,10 +58,11 @@ class ConfigManager(object):
                 setattr(self, key.upper(), value)
 
 
-    def write_device_index(self, index):
-        print(index)
-        print(self._config)
+    def write_device_index(self, param, index):
+        """
+            Method used to override param on configuration file.
+        """
         if not self._config is None:
-            self._config[PROG]['input_device_index'] = str(index);
+            self._config[PROG][param] = str(index);
             with open(USER_CONFIG, 'w') as configfile:
                 self._config.write(configfile)

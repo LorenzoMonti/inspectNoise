@@ -19,7 +19,7 @@ def main():
     if kargs['showindex']:
         show_device_index_list()
     elif kargs['setindex']:
-        conf_manager.write_device_index(kargs['setindex'])
+        conf_manager.write_device_index('input_device_index', kargs['setindex'])
     elif kargs['calibrate']:
         # Call to lounch calibration function
         pass
