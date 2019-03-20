@@ -2,6 +2,13 @@ import os
 from ctypes import *
 import stat
 
+# Glabal variables used by all program.
+PROG = 'inspectNoise'
+USER_DIR = os.path.join(os.path.expanduser('~'), '.' + PROG)
+USER_LOGFILE = os.path.join(USER_DIR, 'log.log')
+USER_CONFIG = os.path.join(USER_DIR, 'config.cnf')
+USER_RECORDFILE = os.path.join(USER_DIR, 'record.wav')
+
 d = os.path.dirname(__file__)
 PROJECT_PATH = os.path.abspath(d)
 
@@ -27,3 +34,10 @@ def create_executable(path, content):
         f.write(content)
     s = os.stat(path)
     os.chmod(path, s.st_mode | stat.S_IEXEC)
+
+def setup_user_dir():
+    """
+        Create user directory.
+    """
+    if not os.path.exists(USER_DIR):
+        os.makedirs(USER_DIR)

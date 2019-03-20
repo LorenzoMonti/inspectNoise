@@ -1,4 +1,5 @@
 import argparse
+from utils import USER_LOGFILE, USER_CONFIG, USER_RECORDFILE
 
 def parse_arguments():
     """
@@ -9,9 +10,11 @@ def parse_arguments():
                         help="Collect data as min, max avg")
     parser.add_argument('-l', '--log', nargs="?",
                         type=argparse.FileType('a'),
+                        const=USER_LOGFILE, # used to create file if user don't specify filename.
                         help="Write data on file as text")
     parser.add_argument('-r', '--record', nargs="?",
                         type=argparse.FileType('a'),
+                        const=USER_RECORDFILE, # used to create file if user don't specify filename.
                         help="Write data on file as audio")
     parser.add_argument('-s', '--seconds',
                         type=int,
