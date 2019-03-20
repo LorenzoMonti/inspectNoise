@@ -5,13 +5,12 @@ import pyaudio
 
 class Config(object):
     """
-        Class used to read configuration file.
+        Class used to create/read configuration file.
     """
     FRAMES_PER_BUFFER = 2048
     FORMAT = pyaudio.paInt16
     CHANNELS = 2
-    INPUT_DEVICE_INDEX = None # da modificare! E' necessario specificare l'Index del device di input appropriato.
-                              # Nel nostro caso bisogna selezionare il microfono.
+    INPUT_DEVICE_INDEX = None # Run showInputDeviceIndex utils to discover index and name of input devices.
     RATE = 44100
     AUDIO_SEGMENT_LENGTH = 0.5
 
@@ -19,6 +18,7 @@ class Config(object):
 
         config = configparser.ConfigParser()
 
+        # If configuration file doesn't exist in user dir. create it.
         if not os.path.exists(USER_CONFIG):
             config[PROG] = {
                 'frame_per_buffer': '2048',
@@ -26,19 +26,22 @@ class Config(object):
                 'channels': '2',
                 'rate': '44100',
                 'audio_segment_length': '0.5',
-                'input_device_index': '0'
+                'input_device_index': '2'
             }
 
             with open(USER_CONFIG, "w") as conf_file:
                 config.write(conf_file)
+
+        # If configuration file already exist in user dir. read it.
         else:
             config_items = dict()
 
-            config.read(USER_CONFIG)
+            config.read(USER_CONFIG) # Read configuration file.
 
             if not config.has_section(PROG):
                 raise Exception("Default section not found in configuration file")
 
+            # Extract key-values pair from file and update our configuration list.
             for key, value in config.items(PROG):
                 if key in ['frame_per_buffer', 'format', 'channels', 'input_device_index', 'rate']:
                     config_items[key] = int(value)
@@ -48,6 +51,7 @@ class Config(object):
                     raise Exception("Param {} in configuration file not recognized".format(key))
 
             for key, value in config_items.items():
+                # Set attribute read by configuration file in the class-attribute.
                 setattr(self, key.upper(), value)
 
             print(config_items)

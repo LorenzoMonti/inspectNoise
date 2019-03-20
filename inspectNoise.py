@@ -9,7 +9,6 @@ def main():
     setup_user_dir();
     config.Config()
     kargs = get_args()
-    print(kargs)
 
 if __name__ == "__main__":
     main()
