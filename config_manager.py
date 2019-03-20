@@ -3,7 +3,7 @@ from utils import USER_CONFIG, PROG
 import configparser
 import pyaudio
 
-class Config(object):
+class ConfigManager(object):
     """
         Class used to create/read configuration file.
     """
@@ -53,5 +53,3 @@ class Config(object):
             for key, value in config_items.items():
                 # Set attribute read by configuration file in the class-attribute.
                 setattr(self, key.upper(), value)
-
-            print(config_items)
