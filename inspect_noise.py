@@ -16,12 +16,14 @@ def main():
 
     print(kargs) #DEBUG
 
+    # if one of these three flags is used on program we run correct function;
+    # otherwhise run instance of NoiseObserver.
     if kargs['showindex']:
         show_device_index_list()
     elif kargs['setindex']:
         conf_manager.write_device_index('input_device_index', kargs['setindex'])
     elif kargs['calibrate']:
-        # Call to lounch calibration function
+        # Call to start calibration function
         pass
     else:
         noise_observer = NoiseObserver(conf_manager, **kargs)
