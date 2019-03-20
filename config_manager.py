@@ -7,6 +7,9 @@ class ConfigManager(object):
     """
         Class used to create/read configuration file.
     """
+
+    _config = None # Instance of configuration reader.
+
     FRAMES_PER_BUFFER = 2048
     FORMAT = pyaudio.paInt16
     CHANNELS = 2
@@ -16,11 +19,11 @@ class ConfigManager(object):
 
     def __init__ (self):
 
-        config = configparser.ConfigParser()
+        self._config = configparser.ConfigParser()
 
         # If configuration file doesn't exist in user dir. create it.
         if not os.path.exists(USER_CONFIG):
-            config[PROG] = {
+            self._config[PROG] = {
                 'frame_per_buffer': '2048',
                 'format': '8',
                 'channels': '2',
@@ -30,19 +33,19 @@ class ConfigManager(object):
             }
 
             with open(USER_CONFIG, "w") as conf_file:
-                config.write(conf_file)
+                _config.write(conf_file)
 
         # If configuration file already exist in user dir. read it.
         else:
             config_items = dict()
 
-            config.read(USER_CONFIG) # Read configuration file.
+            self._config.read(USER_CONFIG) # Read configuration file.
 
-            if not config.has_section(PROG):
+            if not self._config.has_section(PROG):
                 raise Exception("Default section not found in configuration file")
 
             # Extract key-values pair from file and update our configuration list.
-            for key, value in config.items(PROG):
+            for key, value in self._config.items(PROG):
                 if key in ['frame_per_buffer', 'format', 'channels', 'input_device_index', 'rate']:
                     config_items[key] = int(value)
                 elif key in ['audio_segment_length']:
@@ -53,3 +56,12 @@ class ConfigManager(object):
             for key, value in config_items.items():
                 # Set attribute read by configuration file in the class-attribute.
                 setattr(self, key.upper(), value)
+
+
+    def write_device_index(self, index):
+        print(index)
+        print(self._config)
+        if not self._config is None:
+            self._config[PROG]['input_device_index'] = str(index);
+            with open(USER_CONFIG, 'w') as configfile:
+                self._config.write(configfile)

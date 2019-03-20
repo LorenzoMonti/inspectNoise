@@ -1,5 +1,6 @@
 from cli import get_args
-from utils import setup_user_dir
+from utils import setup_user_dir, show_device_index_list
+from config_manager import ConfigManager
 import signal
 from noise_observer import NoiseObserver
 
@@ -9,9 +10,21 @@ def main():
     """
     setup_user_dir();
 
+    conf_manager = ConfigManager()
+
     kargs = get_args()
 
-    noise_observer = NoiseObserver()
+    print(kargs) #DEBUG
+
+    if kargs['showindex']:
+        show_device_index_list()
+    elif kargs['setindex']:
+        conf_manager.write_device_index(kargs['setindex'])
+    elif kargs['calibrate']:
+        # Call to lounch calibration function
+        pass
+    else:
+        noise_observer = NoiseObserver(conf_manager, **kargs)
 
     #noise_observer.start()
 
@@ -21,7 +34,7 @@ def sigint_handler(signum, frame):
     """
         Termination Signal Handler.
     """
-    #noise_observer.graceful()
+    #noise_observer.graceful() # CALL METHOD TO STOP NOISE OBSERVER
 
 # This function/Handler will be called when a SIGALARM event occur.
 # This event is generated when timeout (seconds set by command line interface) expired.
@@ -29,7 +42,7 @@ def sigalrm_handler(signum, frame):
     """
         SEGALAERM Handler.
     """
-    #noise_observer.timeout()
+    #noise_observer.timeout() CALL METHOD TO STOP NOISE OBSERVER
 
 
 # Register signal handlers.

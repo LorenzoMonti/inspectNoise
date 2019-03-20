@@ -1,6 +1,7 @@
 import os
 from ctypes import *
 import stat
+import pyaudio
 
 # Glabal variables used by all program.
 PROG = 'inspectNoise'
@@ -41,3 +42,13 @@ def setup_user_dir():
     """
     if not os.path.exists(USER_DIR):
         os.makedirs(USER_DIR)
+
+# Method used to detect and show audio device index.
+# Thanks to: https://stackoverflow.com/questions/36894315/how-to-select-a-specific-input-device-with-pyaudio
+def show_device_index_list():
+    p = pyaudio.PyAudio()
+    info = p.get_host_api_info_by_index(0)
+    numdevices = info.get('deviceCount')
+    for i in range(0, numdevices):
+        if (p.get_device_info_by_host_api_device_index(0, i).get('maxInputChannels')) > 0:
+            print("Input Device id ", i, " - ", p.get_device_info_by_host_api_device_index(0, i).get('name'))
