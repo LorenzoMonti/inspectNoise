@@ -19,12 +19,12 @@ def main():
     conf_manager = ConfigManager()
 
     kargs = get_args()
-
+    print(kargs)
     # if one of these three flags is used on program we run correct function;
     # otherwhise run instance of NoiseObserver.
     if kargs['showindex']:
         show_device_index_list()
-    elif kargs['setindex']:
+    elif kargs['setindex'] != None: # If kargs['setindex'] is 0 condition is false withut != None.
         conf_manager.write_device_index('input_device_index', kargs['setindex'])
     elif kargs['calibrate']:
         # Call to start calibration function
@@ -50,7 +50,7 @@ def sigint_handler(signum, frame):
 # This event is generated when timeout (seconds set by command line interface) expired.
 def sigalrm_handler(signum, frame):
     """
-        SEGALAERM Handler.
+        SEGALARM Handler.
     """
     noise_observer.timeout()
 
