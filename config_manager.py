@@ -13,8 +13,8 @@ class ConfigManager(object):
 
     FRAMES_PER_BUFFER = 2048
     FORMAT = pyaudio.paInt16
-    CHANNELS = 2
-    INPUT_DEVICE_INDEX = None # Run showInputDeviceIndex utils to discover index and name of input devices.
+    CHANNELS = 1 # check number of channel whit get_device_info_by_index(index)
+    INPUT_DEVICE_INDEX = 2 # Run inspect_noise with --showindex for discover index and name of input devices.
     RATE = 44100
     AUDIO_SEGMENT_LENGTH = 0.5
 
@@ -33,7 +33,7 @@ class ConfigManager(object):
             self._config[PROG] = {
                 'frames_per_buffer': '2048',
                 'format': '8',
-                'channels': '2',
+                'channels': '1',
                 'rate': '44100',
                 'audio_segment_length': '0.5',
                 'input_device_index': '2'
@@ -53,7 +53,7 @@ class ConfigManager(object):
 
             # Extract key-values pair from file and update our configuration list.
             for key, value in self._config.items(PROG):
-                if key in ['frame_per_buffer', 'format', 'channels', 'input_device_index', 'rate']:
+                if key in ['frames_per_buffer', 'format', 'channels', 'input_device_index', 'rate']:
                     config_items[key] = int(value)
                 elif key in ['audio_segment_length']:
                     config_items[key] = float(value)

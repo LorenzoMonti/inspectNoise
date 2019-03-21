@@ -10,11 +10,13 @@ def main():
     """
     setup_user_dir();
 
+    # Register signal handlers.
+    signal.signal(signal.SIGINT, sigint_handler)
+    signal.signal(signal.SIGALRM, sigalrm_handler)
+
     conf_manager = ConfigManager()
 
     kargs = get_args()
-
-    print(kargs) #DEBUG
 
     # if one of these three flags is used on program we run correct function;
     # otherwhise run instance of NoiseObserver.
@@ -30,16 +32,16 @@ def main():
         del kargs['setindex']
         del kargs['calibrate']
         noise_observer = NoiseObserver(**kargs)
+        noise_observer.start_monitoring()
 
-    #noise_observer.start()
+# Signal handlers+
 
-# Signal handlers
 # This function is called when termination signal event occur.
 def sigint_handler(signum, frame):
     """
         Termination Signal Handler.
     """
-    #noise_observer.graceful() # CALL METHOD TO STOP NOISE OBSERVER
+    noise_observer.stop_monitoring()
 
 # This function/Handler will be called when a SIGALARM event occur.
 # This event is generated when timeout (seconds set by command line interface) expired.
@@ -47,12 +49,7 @@ def sigalrm_handler(signum, frame):
     """
         SEGALAERM Handler.
     """
-    #noise_observer.timeout() CALL METHOD TO STOP NOISE OBSERVER
-
-
-# Register signal handlers.
-signal.signal(signal.SIGINT, sigint_handler)
-signal.signal(signal.SIGALRM, sigalrm_handler)
+    noise_observer.timeout()
 
 # Call main program.
 if __name__ == "__main__":

@@ -7,7 +7,7 @@ import signal
 import time
 from config_manager import ConfigManager
 from io import BytesIO as StringIO
-from utils import noalsaerr
+from utils import noalsaerr, coroutine
 
 class NoiseObserver(object):
 
@@ -53,6 +53,7 @@ class NoiseObserver(object):
         if self.collect:
             data_stats = dict()
 
+    @coroutine
     def record(self):
         """
             Record PyAudio into memory buffer (StringIO).
@@ -94,7 +95,7 @@ class NoiseObserver(object):
         # We use 2 CHANNELS so we have for each sampling 2 value replied, indeed we multiply this number for 0,5 (SEGMENT).
         # If we double channels number we have to divide by 4 the segment (0,25), because the set of useful value is 4 times
         # smaller.
-        self.num_frames = int(self.config_manager.RATE / self.config.FRAMES_PER_BUFFER * segment)
+        self.num_frames = int(self.config_manager.RATE / self.config_manager.FRAMES_PER_BUFFER * segment)
 
         if self.seconds:
             # First param means that timer is decremented at real time.
@@ -112,10 +113,10 @@ class NoiseObserver(object):
         self.is_running = True
 
         # Generator of audio frame.
-        record = self.record()
+        record_gen = self.record()
 
         while self.alive:
-            next(record)
+            next(record_gen)
 
             recorded_data = self.output.getvalue() # Getting value writed in memory buffer by record.
             segment = pydub.AudioSegment(data) # Created audio segment by data recorded.
@@ -149,8 +150,10 @@ class NoiseObserver(object):
         print("Recording stopped...")
 
     def timeout(self):
-        self.alive = False
-        self.is_running = False
+        """
+            Method called when time expired.
+        """
+        stop_monitoring()
 
         print("Time expired...")
 
