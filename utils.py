@@ -2,6 +2,7 @@ import os
 from ctypes import *
 import stat
 import pyaudio
+from contextlib import contextmanager
 
 # Glabal variables used by all program.
 PROG = 'inspectNoise'
@@ -65,9 +66,9 @@ ERROR_HANDLER_FUNC = CFUNCTYPE(None, c_char_p, c_int,
 def py_error_handler(filename, line, function, err, fmt):
     pass
 
-
 c_error_handler = ERROR_HANDLER_FUNC(py_error_handler)
 
+@contextmanager
 def noalsaerr():
     """
         Method used to load C lib.

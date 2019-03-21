@@ -29,7 +29,7 @@ def main():
         del kargs['showindex']
         del kargs['setindex']
         del kargs['calibrate']
-        #noise_observer = NoiseObserver(**kargs)
+        noise_observer = NoiseObserver(**kargs)
 
     #noise_observer.start()
 

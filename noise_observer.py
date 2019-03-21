@@ -3,6 +3,8 @@ import pydub
 import os
 import logging
 import wave
+import signal
+import time
 from config_manager import ConfigManager
 from io import BytesIO as StringIO
 from utils import noalsaerr
@@ -12,7 +14,14 @@ class NoiseObserver(object):
     def __init__ (self, seconds = None, log = None,
                   collect = False, record = None,
                   bitrate = None, format = None):
-
+        """
+            :seconds: if flag was set it is the number of seconds when we need to monitor noise.
+            :log: if flag is set, it represent name of log file.
+            :collect: if this flag is set we need to collect and calculate min, max avg of data.
+            :record: if this flag is set contains the name of audio file into record.
+            :bitrate: if this flag is set contains the bitrate for printing file.
+            :format: if is set contains export format.
+        """
         self.config_manager = ConfigManager() # Get singletoon instance of configuration manager.
 
         # Save param passed as local variables.
@@ -42,10 +51,37 @@ class NoiseObserver(object):
         if self.log:
             setup_log()
 
+    def record(self):
+        """
+            Record PyAudio into memory buffer (StringIO).
+        """
+        while True:
+            frames = [] # list of already read freames.
+            self.stream.start_stream()
+            for i in range(self.num_frames):
+                # Reads FRAMES_PER_BUFFER chunks.
+                data = self.stream.read(self.config_manager.FRAMES_PER_BUFFER)
+                frames.append(data)
+                
+            # Positioning index on the start of the buffer.
+            self.output.seek(0)
+
+            # StringIO passed as first param to write into memory buffer.
+            w = wave.open(self.output, 'wb')
+
+            # Setting params of wav
+            w.setnchannels(self.config_manager.CHANNELS)
+            w.setsampwidth(self.audio.get_sample_size(self.config_manager.FORMAT))
+            w.setframerate(self.config_manager.RATE)
+            w.writeframes(b''.join(frames))
+            w.close()
+            yield
+
     def start_monitoring(self):
         """
             Method called to start monitoring.
         """
+        self.is_running = True
         while self.alive:
             pass
 

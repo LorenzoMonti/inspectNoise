@@ -31,7 +31,7 @@ class ConfigManager(object):
         # If configuration file doesn't exist in user dir. create it.
         if not os.path.exists(USER_CONFIG):
             self._config[PROG] = {
-                'frame_per_buffer': '2048',
+                'frames_per_buffer': '2048',
                 'format': '8',
                 'channels': '2',
                 'rate': '44100',
