@@ -38,7 +38,14 @@ class NoiseObserver(object):
         # Load C lib necessary for audio record.
         with noalsaerr():
             self.audio = pyaudio.PyAudio()
-        print("OPEN")
+
+        # TODO: Dopo l'istruzione sottostante dà errore.
+        # Dopo varie prove a microfono scollegato (utilizzando quello di default)
+        # ho notato che il segmentation fault è derivante dal fatto che aggiustando i parametri
+        # per un microfono, utilizzandone un altro il setting non va a buon termine.
+        # --> Segmentation fault: 11
+        # Da testare con microfono del laboratorio che ha un singolo channel ecc.. 
+
         # Initialize input PyAudio stream.
         self.stream = self.audio.open(
             format = self.config_manager.FORMAT,
@@ -47,7 +54,7 @@ class NoiseObserver(object):
             input = True,
             rate = self.config_manager.RATE,
             frames_per_buffer = self.config_manager.FRAMES_PER_BUFFER)
-        print("END STREAM CREATION")
+
         if self.log:
             setup_log()
         if self.collect:
