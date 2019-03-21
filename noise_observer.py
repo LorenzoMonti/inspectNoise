@@ -50,19 +50,21 @@ class NoiseObserver(object):
 
         if self.log:
             setup_log()
+        if self.collect:
+            data_stats = dict()
 
     def record(self):
         """
             Record PyAudio into memory buffer (StringIO).
         """
         while True:
-            frames = [] # list of already read freames.
+            frames = [] # List of already read frames.
             self.stream.start_stream()
             for i in range(self.num_frames):
                 # Reads FRAMES_PER_BUFFER chunks.
                 data = self.stream.read(self.config_manager.FRAMES_PER_BUFFER)
                 frames.append(data)
-                
+
             # Positioning index on the start of the buffer.
             self.output.seek(0)
 
@@ -81,9 +83,56 @@ class NoiseObserver(object):
         """
             Method called to start monitoring.
         """
+        segment = self.config_manager.AUDIO_SEGMENT_LENGTH
+
+        # See: https://stackoverflow.com/questions/35970282/what-are-chunks-samples-and-frames-when-using-pyaudio
+        # Calculate number of frames.
+        # We have 2048 frame per buffer.
+        # Our sampling rate is 44100 (elements for each seconds).
+        # If we divide our sampling rate for the number of frame in buffer we have the number of
+        # buffer necessary to contain our samplings.
+        # We use 2 CHANNELS so we have for each sampling 2 value replied, indeed we multiply this number for 0,5 (SEGMENT).
+        # If we double channels number we have to divide by 4 the segment (0,25), because the set of useful value is 4 times
+        # smaller.
+        self.num_frames = int(self.config_manager.RATE / self.config.FRAMES_PER_BUFFER * segment)
+
+        if self.seconds:
+            # First param means that timer is decremented at real time.
+            # Seconds params indicate number of seconds.
+            # When the time expired will be generated a SIGALRM signal (Handler for this signal in inspect_noise).
+            signal.setitimer(signal.ITIMER_REAL, self.seconds)
+
+        if self.collect:
+            print("Collectiong db values...")
+        if self.record:
+            print("Record values on audio file {}...".format(self.record))
+        if self.log:
+            print("Write values on a log file {}...".format(self.log))
+
         self.is_running = True
+
+        # Generator of audio frame.
+        record = self.record()
+
         while self.alive:
-            pass
+            next(record)
+
+            recorded_data = self.output.getvalue() # Getting value writed in memory buffer by record.
+            segment = pydub.AudioSegment(data) # Created audio segment by data recorded.
+
+            dbSPL = segment.spl # Getting value of dbSPL by pydub.
+
+            if self.collect:
+                collect_data(dbSPL)
+            if self.log:
+                self.logger_file.info(dbSPL)
+            if self.record:
+                # Use thread to process audio data.
+                pass
+
+            # Always print data on stdout.
+            sys.stdout.write('\r%10d  ' % dbSPL)
+            sys.stdout.flush()
 
     def stop_monitoring(self):
         """
@@ -92,11 +141,34 @@ class NoiseObserver(object):
         self.is_running = False
         self.alive = False
 
+        if self.collect:
+            print("Min: {}".format(self.data_stats['min']))
+            print("Max: {}".format(self.data_stats['max']))
+            print("Avg: {}".format(self.data_stats['avg']))
+
+        print("Recording stopped...")
+
+    def timeout(self):
+        self.alive = False
+        self.is_running = False
+
+        print("Time expired...")
+
     def is_running(self):
         """
             Return noise observer status.
         """
         return self.is_running
+
+    def collect_data(self, dbSPL):
+        if self.data_stats:
+            self.data_stats['min'] = min(dbSPL, self.data_stats['min'])
+            self.data_stats['max'] = max(dbSPL, self.data_stats['max'])
+            self.data_stats['avg'] = dbSPL + self.data_stats['avg'] / 2
+        else:
+            self.data_stats['min'] = dbSPL
+            self.data_stats['max'] = dbSPL
+            self.data_stats['avg'] = dbSPL
 
     def setup_log(self):
         """
