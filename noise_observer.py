@@ -37,13 +37,24 @@ class NoiseObserver(object):
         if self.log:
             setup_log()
 
-    def start(self):
+    def start_monitoring(self):
+        """
+            Method called to start monitoring.
+        """
+        while self.alive:
+            pass
 
-    def stop(self):
+    def stop_monitoring(self):
+        """
+            Method called to stop monitoring of sound.
+        """
         self.is_running = False
         self.alive = False
 
     def is_running(self):
+        """
+            Return noise observer status.
+        """
         return self.is_running
 
     def setup_log(self):
@@ -55,8 +66,3 @@ class NoiseObserver(object):
             format = "%(asctime)s %(message)s", # Format date_time data.
             level = logging.INFO)
         self.logger_file = logging.getLogger(__name__) # Get logger personalized logger.
-
-    def append_audio(self, segment):
-        old_trace = AudioSegment.from_wav(self.record)
-        new_tarce = old_trace + segment
-        new_trace.export(self.record, format="wav")

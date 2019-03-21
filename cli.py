@@ -25,16 +25,22 @@ def parse_arguments():
                         help="Show input device index")
     parser.add_argument('-se', '--setindex', type=int,
                         help="Set input device index")
+    parser.add_argument('-f', '--format', type=str,
+                        const="mp3",
+                        help="Set exportation format")
+    parser.add_argument('-b', '--bitrate', type=int,
+                        const="256",
+                        help="Set exportation bitrate")
 
     args = parser.parse_args()
 
-    if args.calibrate and (args.log or args.record or args.seconds or args.collect or args.showindex or args.setindex):
+    if args.calibrate and (args.log or args.record or args.seconds or args.collect or args.showindex or args.setindex or args.format or args.bitrate):
         raise parser.error("Calibrate flag can't be used with others flags")
 
-    if args.showindex and (args.log or args.record or args.seconds or args.collect or args.calibrate or args.setindex):
+    if args.showindex and (args.log or args.record or args.seconds or args.collect or args.calibrate or args.setindex or args.format or args.bitrate):
         raise parser.error("Show index flag can't be used with others flags")
 
-    if args.setindex and (args.log or args.record or args.seconds or args.collect or args.calibrate or args.showindex):
+    if args.setindex and (args.log or args.record or args.seconds or args.collect or args.calibrate or args.showindex or args.format or args.bitrate):
         raise parser.error("Set index flag can't be used with others flags")
 
     if args.seconds:
@@ -49,6 +55,17 @@ def parse_arguments():
         if args.seconds > (3600 * 24): # Number of seconds in a day.
             raise parser.error("Number of seconds too large --> Note max is 86400s (seconds in a day)")
 
+    if args.format:
+        if args.format.lower() in ['mp3', 'ogg', 'wav']: # possible formats.
+            raise parser.error("Insert standard format {} !".format("mp3 - wav - ogg"))
+
+    if args.bitrate:
+        if args.bitrate in [128, 256, 320]: # possible bitrates.
+            raise parser.error("Insert standard bitrate 128 - 256 - 320 !")
+
+    if (args.format or args.bitrate) and not args.record:
+        raise parser.error("Format and Bitrate can be specified only with record.")
+        
     return args
 
 def get_args():
