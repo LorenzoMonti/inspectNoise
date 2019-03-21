@@ -4,6 +4,8 @@ from config_manager import ConfigManager
 import signal
 from noise_observer import NoiseObserver
 
+noise_observer = None
+
 def main():
     """
         Entry point of application.
@@ -41,7 +43,8 @@ def sigint_handler(signum, frame):
     """
         Termination Signal Handler.
     """
-    noise_observer.stop_monitoring()
+    if noise_observer:
+        noise_observer.stop_monitoring()
 
 # This function/Handler will be called when a SIGALARM event occur.
 # This event is generated when timeout (seconds set by command line interface) expired.

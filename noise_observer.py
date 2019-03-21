@@ -47,7 +47,7 @@ class NoiseObserver(object):
             input = True,
             rate = self.config_manager.RATE,
             frames_per_buffer = self.config_manager.FRAMES_PER_BUFFER)
-        print("END STREAM")
+        print("END STREAM CREATION")
         if self.log:
             setup_log()
         if self.collect:
