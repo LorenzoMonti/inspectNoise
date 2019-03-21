@@ -8,6 +8,7 @@ class ConfigManager(object):
         Class used to create/read configuration file.
     """
 
+    _config_manager = None # Singletoon instance of this class.
     _config = None # Instance of configuration reader.
 
     FRAMES_PER_BUFFER = 2048
@@ -16,6 +17,12 @@ class ConfigManager(object):
     INPUT_DEVICE_INDEX = None # Run showInputDeviceIndex utils to discover index and name of input devices.
     RATE = 44100
     AUDIO_SEGMENT_LENGTH = 0.5
+
+    def __new__ (self):
+        # if is not define create new instance otherwise return only instance of thi class.
+        if not isinstance(self._config_manager, self):
+            self._config_manager = object.__new__(self)
+        return self._config_manager
 
     def __init__ (self):
 
@@ -66,3 +73,11 @@ class ConfigManager(object):
             self._config[PROG][param] = str(index);
             with open(USER_CONFIG, 'w') as configfile:
                 self._config.write(configfile)
+
+    def get_config_value(self, param):
+        """
+            Method used to read param from configuration file.
+        """
+        if self._config:
+            return self._config[PROG][param]
+        return None

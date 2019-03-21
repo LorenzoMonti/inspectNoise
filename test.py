@@ -1,9 +1,10 @@
 import unittest
 import os
-from utils import *
 import subprocess
 import sys
 import ast
+from utils import *
+from config_manager import ConfigManager
 
 class TestCli(unittest.TestCase):
     """
@@ -65,6 +66,17 @@ class TestCli(unittest.TestCase):
         os.remove(".test_calibrate.py")
         os.remove(".test_log.py")
         os.remove(".test_record.py")
+
+class TestConfig(unittest.TestCase):
+
+    def test_setindex(self):
+        """
+            Test of setindex flag and correct update of configuration file.
+        """
+        index = 1
+        res = subprocess.run([sys.executable, "inspect_noise.py", "--setindex", str(index)])
+        cnf_manager = ConfigManager()
+        self.assertEqual(int(cnf_manager.get_config_value("input_device_index")), index)
 
 if __name__ == '__main__':
     unittest.main()
