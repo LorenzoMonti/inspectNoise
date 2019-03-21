@@ -26,7 +26,7 @@ def main():
         # Call to start calibration function
         pass
     else:
-        noise_observer = NoiseObserver(conf_manager, **kargs)
+        noise_observer = NoiseObserver(**kargs)
 
     #noise_observer.start()
 

@@ -77,6 +77,7 @@ class ConfigManager(object):
     def get_config_value(self, param):
         """
             Method used to read param from configuration file.
+            (Used for test).
         """
         if self._config:
             return self._config[PROG][param]

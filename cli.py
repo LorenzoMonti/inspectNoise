@@ -45,6 +45,10 @@ def parse_arguments():
         if args.setindex < 0:
             raise parser.error("Input device index must be positive")
 
+    if args.seconds:
+        if args.seconds > (3600 * 24): # Number of seconds in a day.
+            raise parser.error("Number of seconds too large --> Note max is 86400s (seconds in a day)")
+
     return args
 
 def get_args():
