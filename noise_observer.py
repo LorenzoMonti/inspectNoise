@@ -38,7 +38,7 @@ class NoiseObserver(object):
         # Load C lib necessary for audio record.
         with noalsaerr():
             self.audio = pyaudio.PyAudio()
-
+        print("OPEN")
         # Initialize input PyAudio stream.
         self.stream = self.audio.open(
             format = self.config_manager.FORMAT,
@@ -47,7 +47,7 @@ class NoiseObserver(object):
             input = True,
             rate = self.config_manager.RATE,
             frames_per_buffer = self.config_manager.FRAMES_PER_BUFFER)
-
+        print("END STREAM")
         if self.log:
             setup_log()
         if self.collect:
@@ -141,6 +141,8 @@ class NoiseObserver(object):
         """
         self.is_running = False
         self.alive = False
+        self.stream.stop_stream()
+        self.audio.terminate()
 
         if self.collect:
             print("Min: {}".format(self.data_stats['min']))
