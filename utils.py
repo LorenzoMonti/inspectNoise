@@ -68,8 +68,6 @@ def py_error_handler(filename, line, function, err, fmt):
 
 c_error_handler = ERROR_HANDLER_FUNC(py_error_handler)
 
-
-
 def noalsaerr():
     """
         Method used to load C lib.

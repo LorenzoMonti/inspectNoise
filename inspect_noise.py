@@ -26,7 +26,10 @@ def main():
         # Call to start calibration function
         pass
     else:
-        noise_observer = NoiseObserver(**kargs)
+        del kargs['showindex']
+        del kargs['setindex']
+        del kargs['calibrate']
+        #noise_observer = NoiseObserver(**kargs)
 
     #noise_observer.start()
 

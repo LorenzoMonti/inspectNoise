@@ -4,11 +4,14 @@ import os
 import logging
 import wave
 from config_manager import ConfigManager
+from io import BytesIO as StringIO
+from utils import noalsaerr
 
 class NoiseObserver(object):
 
     def __init__ (self, seconds = None, log = None,
-                  collect = False, record = None):
+                  collect = False, record = None,
+                  bitrate = None, format = None):
 
         self.config_manager = ConfigManager() # Get singletoon instance of configuration manager.
 
@@ -17,6 +20,8 @@ class NoiseObserver(object):
         self.seconds = seconds
         self.collect = collect
         self.record = record
+        self.bitrate = bitrate
+        self.format = format
 
         self.is_running = False
         self.output = StringIO()
