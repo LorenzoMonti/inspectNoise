@@ -13,9 +13,6 @@ from utils import noalsaerr, coroutine
 
 class NoiseObserver(object):
 
-    class StopException(Exception):
-        pass
-
     def __init__ (self, seconds = None, log = None,
                   collect = False, record = None,
                   bitrate = None, format = None):
@@ -87,7 +84,7 @@ class NoiseObserver(object):
             # StringIO passed as first param to write into memory buffer.
             w = wave.open(self.output, 'wb')
 
-            # Setting params of wav
+            # Setting params of wav.
             w.setnchannels(self.config_manager.CHANNELS)
             w.setsampwidth(self.audio.get_sample_size(self.config_manager.FORMAT))
             w.setframerate(self.config_manager.RATE)
@@ -121,43 +118,37 @@ class NoiseObserver(object):
         if self.collect:
             print("Collectiong db values...")
         if self.record:
-            print("Record values on audio file {}...".format(self.record))
+            print("Record values on audio file {}...".format(self.record.name))
         if self.log:
-            print("Write values on a log file {}...".format(self.log))
+            print("Write values on a log file {}...".format(self.log.name))
 
         self.is_running = True
 
-        try:
-            # Generator of audio frames.
-            record = self.record_generator()
+        # Generator of audio frames.
+        record = self.record_generator()
 
-            while self.alive:
-                record.send(True)
+        while self.alive:
+            record.send(True)
 
-                recorded_data = self.output.getvalue() # Getting value writed in memory buffer by record.
-                segment = pydub.AudioSegment(recorded_data) # Created audio segment by data recorded.
+            recorded_data = self.output.getvalue() # Getting value writed in memory buffer by record.
+            segment = pydub.AudioSegment(recorded_data) # Created audio segment by data recorded.
 
-                dbSPL = self.convert_to_spl(segment.rms) # Getting value of dbSPL by pydub.
+            dbSPL = self.convert_to_spl(segment.rms) # Getting value of dbSPL by pydub.
 
-                if self.collect:
-                    self.collect_data(dbSPL)
-                if self.log:
-                    self.logger_file.info(dbSPL)
-                if self.record:
-                    # Use thread to process audio data.
-                    pass
+            if self.collect:
+                self.collect_data(dbSPL)
+            if self.log:
+                self.file_logger.info(dbSPL)
+            if self.record:
+                # Use thread to process audio data.
+                pass
 
-                # Always print data on stdout.
-                sys.stdout.write('\r%10d  dbSPL' % dbSPL)
-                sys.stdout.flush()
+            # Always print data on stdout.
+            sys.stdout.write('\r%10d  dbSPL' % dbSPL)
+            sys.stdout.flush()
 
-            self.is_running = False
-            self.close_stream()
-
-        except self.__class__.StopException:
-            print("EXC")
-            self.is_running = False
-            self.stop_monitoring()
+        self.is_running = False
+        self.close_stream()
 
     def close_stream(self):
         """
@@ -213,26 +204,28 @@ class NoiseObserver(object):
         """
             Method used to setup log on text file.
         """
-        self.logger_file = logging.basicConfig(
-            filename = self.log, # Name of the file passed by CLI.
+        self.file_logger = logging.basicConfig(
+            filename = self.log.name, # Name of the file passed by CLI.
             format = "%(asctime)s %(message)s", # Format date_time data.
             level = logging.INFO)
-        self.logger_file = logging.getLogger(__name__) # Get logger personalized logger.
+        self.file_logger = logging.getLogger(__name__) # Get logger personalized logger.
 
     def convert_to_spl(self, rms):
         """
-        Sound Pressure Level - defined as 20 * log10(p/p0),
-        where p is the RMS of the sound wave in Pascals and p0 is
-        20 micro Pascals.
-        Since we would need to know calibration information about the
-        microphone used to record the sound in order to transform
-        the PCM values of this audiosegment into Pascals, we can't really
-        give an accurate SPL measurement.
-        However, we can give a reasonable guess that can certainly be used
-        to compare two sounds taken from the same microphone set up.
-        Be wary about using this to compare sounds taken under different recording
-        conditions however, except as a simple approximation.
-        Returns a scalar float representing the dB SPL of this audiosegment.
+            Sound Pressure Level - defined as 20 * log10(p/p0),
+            where p is the RMS of the sound wave in Pascals and p0 is
+            20 micro Pascals.
+            Since we would need to know calibration information about the
+            microphone used to record the sound in order to transform
+            the PCM values of this audiosegment into Pascals, we can't really
+            give an accurate SPL measurement.
+            However, we can give a reasonable guess that can certainly be used
+            to compare two sounds taken from the same microphone set up.
+            Be wary about using this to compare sounds taken under different recording
+            conditions however, except as a simple approximation.
+            Returns a scalar float representing the dB SPL of this audiosegment.
+
+            See: https://github.com/MaxStrange/AudioSegment/blob/master/audiosegment.py
         """
 
         PASCAL_TO_PCM_FUDGE = 1000
