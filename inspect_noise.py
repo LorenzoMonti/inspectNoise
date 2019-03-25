@@ -4,23 +4,22 @@ from config_manager import ConfigManager
 import signal
 from noise_observer import NoiseObserver
 
-noise_observer = None
+_noise_observer = None
 
 def main():
     """
         Entry point of application.
     """
-    setup_user_dir();
+    global _noise_observer
 
-    # Register signal handlers.
-    signal.signal(signal.SIGINT, sigint_handler)
-    signal.signal(signal.SIGALRM, sigalrm_handler)
+    setup_user_dir();
 
     conf_manager = ConfigManager()
 
     kargs = get_args()
     print(kargs)
-    # if one of these three flags is used on program we run correct function;
+
+    # If one of these three flags is used on program we run correct function;
     # otherwhise run instance of NoiseObserver.
     if kargs['showindex']:
         show_device_index_list()
@@ -30,21 +29,25 @@ def main():
         # Call to start calibration function
         pass
     else:
+
+        # Register signal handlers.
+        signal.signal(signal.SIGINT, sigint_handler)
+        signal.signal(signal.SIGALRM, sigalrm_handler)
+
         del kargs['showindex']
         del kargs['setindex']
         del kargs['calibrate']
-        noise_observer = NoiseObserver(**kargs)
-        noise_observer.start_monitoring()
+        _noise_observer = NoiseObserver(**kargs)
+        _noise_observer.start_monitoring()
 
-# Signal handlers+
+# Signal handlers
 
 # This function is called when termination signal event occur.
 def sigint_handler(signum, frame):
     """
         Termination Signal Handler.
     """
-    if noise_observer:
-        noise_observer.stop_monitoring()
+    _noise_observer.stop_monitoring()
 
 # This function/Handler will be called when a SIGALARM event occur.
 # This event is generated when timeout (seconds set by command line interface) expired.
@@ -52,7 +55,7 @@ def sigalrm_handler(signum, frame):
     """
         SEGALARM Handler.
     """
-    noise_observer.timeout()
+    _noise_observer.timeout()
 
 # Call main program.
 if __name__ == "__main__":

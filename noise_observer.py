@@ -5,11 +5,16 @@ import logging
 import wave
 import signal
 import time
+import sys
+import numpy as np
 from config_manager import ConfigManager
 from io import BytesIO as StringIO
 from utils import noalsaerr, coroutine
 
 class NoiseObserver(object):
+
+    class StopException(Exception):
+        pass
 
     def __init__ (self, seconds = None, log = None,
                   collect = False, record = None,
@@ -33,7 +38,10 @@ class NoiseObserver(object):
         self.format = format
 
         self.is_running = False
+        self.alive = True
+        self.end_message = ""
         self.output = StringIO()
+        self.data_stats = None
 
         # Load C lib necessary for audio record.
         with noalsaerr():
@@ -44,7 +52,7 @@ class NoiseObserver(object):
         # ho notato che il segmentation fault è derivante dal fatto che aggiustando i parametri
         # per un microfono, utilizzandone un altro il setting non va a buon termine.
         # --> Segmentation fault: 11
-        # Da testare con microfono del laboratorio che ha un singolo channel ecc.. 
+        # Da testare con microfono del laboratorio che ha un singolo channel ecc..
 
         # Initialize input PyAudio stream.
         self.stream = self.audio.open(
@@ -56,12 +64,12 @@ class NoiseObserver(object):
             frames_per_buffer = self.config_manager.FRAMES_PER_BUFFER)
 
         if self.log:
-            setup_log()
+            self.setup_log()
         if self.collect:
-            data_stats = dict()
+            self.data_stats = dict()
 
     @coroutine
-    def record(self):
+    def record_generator(self):
         """
             Record PyAudio into memory buffer (StringIO).
         """
@@ -119,52 +127,68 @@ class NoiseObserver(object):
 
         self.is_running = True
 
-        # Generator of audio frame.
-        record_gen = self.record()
+        try:
+            # Generator of audio frames.
+            record = self.record_generator()
 
-        while self.alive:
-            next(record_gen)
+            while self.alive:
+                record.send(True)
 
-            recorded_data = self.output.getvalue() # Getting value writed in memory buffer by record.
-            segment = pydub.AudioSegment(data) # Created audio segment by data recorded.
+                recorded_data = self.output.getvalue() # Getting value writed in memory buffer by record.
+                segment = pydub.AudioSegment(recorded_data) # Created audio segment by data recorded.
 
-            dbSPL = segment.spl # Getting value of dbSPL by pydub.
+                dbSPL = self.convert_to_spl(segment.rms) # Getting value of dbSPL by pydub.
 
-            if self.collect:
-                collect_data(dbSPL)
-            if self.log:
-                self.logger_file.info(dbSPL)
-            if self.record:
-                # Use thread to process audio data.
-                pass
+                if self.collect:
+                    self.collect_data(dbSPL)
+                if self.log:
+                    self.logger_file.info(dbSPL)
+                if self.record:
+                    # Use thread to process audio data.
+                    pass
 
-            # Always print data on stdout.
-            sys.stdout.write('\r%10d  ' % dbSPL)
-            sys.stdout.flush()
+                # Always print data on stdout.
+                sys.stdout.write('\r%10d  dbSPL' % dbSPL)
+                sys.stdout.flush()
+
+            self.is_running = False
+            self.close_stream()
+
+        except self.__class__.StopException:
+            print("EXC")
+            self.is_running = False
+            self.stop_monitoring()
+
+    def close_stream(self):
+        """
+            Method called after eneded monitoring.
+        """
+        self.stream.stop_stream()
+        self.audio.terminate()
+
+        sys.stdout.write("\n")
+
+        if self.collect:
+            print("Min: {:.2f}".format(self.data_stats['min']))
+            print("Max: {:.2f}".format(self.data_stats['max']))
+            print("Avg: {:.2f}".format(self.data_stats['avg']))
+
+        sys.stdout.write("\n{}\n".format(self.end_message))
 
     def stop_monitoring(self):
         """
             Method called to stop monitoring of sound.
+            When this method is called allow to terminate current record.
         """
-        self.is_running = False
         self.alive = False
-        self.stream.stop_stream()
-        self.audio.terminate()
-
-        if self.collect:
-            print("Min: {}".format(self.data_stats['min']))
-            print("Max: {}".format(self.data_stats['max']))
-            print("Avg: {}".format(self.data_stats['avg']))
-
-        print("Recording stopped...")
+        self.end_message += "Recoring stooped..."
 
     def timeout(self):
         """
             Method called when time expired.
         """
-        stop_monitoring()
-
-        print("Time expired...")
+        self.end_message = "Time expired...\n"
+        self.stop_monitoring()
 
     def is_running(self):
         """
@@ -173,6 +197,9 @@ class NoiseObserver(object):
         return self.is_running
 
     def collect_data(self, dbSPL):
+        """
+            Method used to collect data as min, max and avg.
+        """
         if self.data_stats:
             self.data_stats['min'] = min(dbSPL, self.data_stats['min'])
             self.data_stats['max'] = max(dbSPL, self.data_stats['max'])
@@ -191,3 +218,26 @@ class NoiseObserver(object):
             format = "%(asctime)s %(message)s", # Format date_time data.
             level = logging.INFO)
         self.logger_file = logging.getLogger(__name__) # Get logger personalized logger.
+
+    def convert_to_spl(self, rms):
+        """
+        Sound Pressure Level - defined as 20 * log10(p/p0),
+        where p is the RMS of the sound wave in Pascals and p0 is
+        20 micro Pascals.
+        Since we would need to know calibration information about the
+        microphone used to record the sound in order to transform
+        the PCM values of this audiosegment into Pascals, we can't really
+        give an accurate SPL measurement.
+        However, we can give a reasonable guess that can certainly be used
+        to compare two sounds taken from the same microphone set up.
+        Be wary about using this to compare sounds taken under different recording
+        conditions however, except as a simple approximation.
+        Returns a scalar float representing the dB SPL of this audiosegment.
+        """
+
+        PASCAL_TO_PCM_FUDGE = 1000
+        P_REF_PASCAL = 2E-5
+        P_REF_PCM = P_REF_PASCAL * PASCAL_TO_PCM_FUDGE
+
+        ratio = rms / P_REF_PCM
+        return 20.0 * np.log10(ratio + 1E-9)  # 1E-9 for numerical stability
