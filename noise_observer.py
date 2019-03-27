@@ -10,12 +10,13 @@ import numpy as np
 from config_manager import ConfigManager
 from io import BytesIO as StringIO
 from utils import noalsaerr, coroutine
+from buffered_writer import *
 
 class NoiseObserver(object):
 
     def __init__ (self, seconds = None, log = None,
                   collect = False, record = None,
-                  bitrate = None, format = None):
+                  bitrate = 256, format = "mp3"):
         """
             :seconds: if flag was set it is the number of seconds when we need to monitor noise.
             :log: if flag is set, it represent name of log file.
@@ -39,17 +40,11 @@ class NoiseObserver(object):
         self.end_message = ""
         self.output = StringIO()
         self.data_stats = None
+        self.audio_writer = None
 
         # Load C lib necessary for audio record.
         with noalsaerr():
             self.audio = pyaudio.PyAudio()
-
-        # TODO: Dopo l'istruzione sottostante dà errore.
-        # Dopo varie prove a microfono scollegato (utilizzando quello di default)
-        # ho notato che il segmentation fault è derivante dal fatto che aggiustando i parametri
-        # per un microfono, utilizzandone un altro il setting non va a buon termine.
-        # --> Segmentation fault: 11
-        # Da testare con microfono del laboratorio che ha un singolo channel ecc..
 
         # Initialize input PyAudio stream.
         self.stream = self.audio.open(
@@ -64,6 +59,8 @@ class NoiseObserver(object):
             self.setup_log()
         if self.collect:
             self.data_stats = dict()
+        if self.record:
+            self.setup_record()
 
     @coroutine
     def record_generator(self):
@@ -98,7 +95,6 @@ class NoiseObserver(object):
         """
         segment = self.config_manager.AUDIO_SEGMENT_LENGTH
 
-        # See: https://stackoverflow.com/questions/35970282/what-are-chunks-samples-and-frames-when-using-pyaudio
         # Calculate number of frames.
         # We have 2048 frame per buffer.
         # Our sampling rate is 44100 (elements for each seconds).
@@ -107,6 +103,8 @@ class NoiseObserver(object):
         # We use 2 CHANNELS so we have for each sampling 2 value replied, indeed we multiply this number for 0,5 (SEGMENT).
         # If we double channels number we have to divide by 4 the segment (0,25), because the set of useful value is 4 times
         # smaller.
+        #
+        # See: https://stackoverflow.com/questions/35970282/what-are-chunks-samples-and-frames-when-using-pyaudio
         self.num_frames = int(self.config_manager.RATE / self.config_manager.FRAMES_PER_BUFFER * segment)
 
         if self.seconds:
@@ -118,7 +116,7 @@ class NoiseObserver(object):
         if self.collect:
             print("Collectiong db values...")
         if self.record:
-            print("Record values on audio file {}...".format(self.record.name))
+            print("Record values on audio file {}...".format(self.record))
         if self.log:
             print("Write values on a log file {}...".format(self.log.name))
 
@@ -140,8 +138,7 @@ class NoiseObserver(object):
             if self.log:
                 self.file_logger.info(dbSPL)
             if self.record:
-                # Use thread to process audio data.
-                pass
+                self.audio_writer.write(recorded_data)
 
             # Always print data on stdout.
             sys.stdout.write('\r%10d  dbSPL' % dbSPL)
@@ -156,7 +153,11 @@ class NoiseObserver(object):
         """
         self.stream.stop_stream()
         self.audio.terminate()
-
+        print("FFLUSH INIT")
+        if self.record:
+            # Write last data on file.
+            self.audio_writer.buffer_fflush()
+        print("FFLUSH ENDED")
         sys.stdout.write("\n")
 
         if self.collect:
@@ -210,6 +211,13 @@ class NoiseObserver(object):
             level = logging.INFO)
         self.file_logger = logging.getLogger(__name__) # Get logger personalized logger.
 
+    def setup_record(self):
+        """
+            Method used to create file for setup record file.
+        """
+        create_audio_file(self.record, self.format, self.bitrate)
+        self.audio_writer = BufferedWriter(self.bitrate, self.format, self.record)
+
     def convert_to_spl(self, rms):
         """
             Sound Pressure Level - defined as 20 * log10(p/p0),
@@ -233,4 +241,4 @@ class NoiseObserver(object):
         P_REF_PCM = P_REF_PASCAL * PASCAL_TO_PCM_FUDGE
 
         ratio = rms / P_REF_PCM
-        return 20.0 * np.log10(ratio + 1E-9)  # 1E-9 for numerical stability
+        return 20.0 * np.log10(ratio + 1E-9)  # 1E-9 for numerical stability.

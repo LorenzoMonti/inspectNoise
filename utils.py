@@ -2,6 +2,7 @@ import os
 from ctypes import *
 import stat
 import pyaudio
+import pydub
 from contextlib import contextmanager
 
 # Glabal variables used by all program.
@@ -9,7 +10,7 @@ PROG = 'inspectNoise'
 USER_DIR = os.path.join(os.path.expanduser('~'), '.' + PROG)
 USER_LOGFILE = os.path.join(USER_DIR, 'log.log')
 USER_CONFIG = os.path.join(USER_DIR, 'config.cnf')
-USER_RECORDFILE = os.path.join(USER_DIR, 'record.wav')
+USER_RECORDFILE = os.path.join(USER_DIR, 'record.mp3')
 
 d = os.path.dirname(__file__)
 PROJECT_PATH = os.path.abspath(d)
@@ -43,6 +44,18 @@ def setup_user_dir():
     """
     if not os.path.exists(USER_DIR):
         os.makedirs(USER_DIR)
+
+
+def create_audio_file(name, format, bitrate):
+    """
+        Method used to crate empty audio file.
+    """
+    if not os.path.exists(name):
+        # Create an empty audio segment.
+        dumb_data = pydub.AudioSegment.silent(duration=1000)
+
+        dumb_data.export(name, format=str(format), bitrate=str(bitrate)+"k")
+
 
 # Method used to detect and show audio device index.
 # Thanks to: https://stackoverflow.com/questions/36894315/how-to-select-a-specific-input-device-with-pyaudio

@@ -73,7 +73,7 @@ class TestConfig(unittest.TestCase):
         """
             Test of setindex flag and correct update of configuration file.
         """
-        index = 1
+        index = 2
         res = subprocess.run([sys.executable, "inspect_noise.py", "--setindex", str(index)])
         cnf_manager = ConfigManager()
         self.assertEqual(int(cnf_manager.get_config_value("input_device_index")), index)

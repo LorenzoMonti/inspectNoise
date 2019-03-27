@@ -18,7 +18,6 @@ class FileAudioWriter(Thread):
         self.bitrate = bitrate
         self.format = format
         self.file = file
-        create_audio_file(self.file)
 
     def run(self):
         while True:
@@ -27,18 +26,21 @@ class FileAudioWriter(Thread):
 
             self.write_on_file(data)
 
+            self.queue.task_done()
+
     def write_on_file(self, data):
-        # Create an empty audio segment.
-        merged = pydub.AudioSegment.empty()
+        print("\nPrinting on file")
 
         # Convert byte data into audio segment
         new_data = pydub.AudioSegment(data)
 
         # Reads old data from file.
-        stored_data = pydub.AudioSegment.from_file(self.file)
+        stored_data = pydub.AudioSegment.from_file(self.file, format=self.format)
 
         # Merge audio data.
         merged = stored_data + new_data
 
         # Write merged audio segment on file.
-        merged.export(self.file, format=str(self.format), bitrate=str(self.bitrate)+"k")
+        merged.export(self.file, format=self.format, bitrate=str(self.bitrate)+"k")
+        
+        print("End printing")
