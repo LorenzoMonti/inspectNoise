@@ -13,10 +13,10 @@ class ConfigManager(object):
 
     FRAMES_PER_BUFFER = 2048
     FORMAT = pyaudio.paInt16
-    CHANNELS = 1 # check number of channel whit get_device_info_by_index(index)
-    INPUT_DEVICE_INDEX = 2 # Run inspect_noise with --showindex for discover index and name of input devices.
+    CHANNELS = 2 # check number of channel whit get_device_info_by_index(index)
+    INPUT_DEVICE_INDEX = 0 # Run inspect_noise with --showindex for discover index and name of input devices.
     RATE = 44100
-    AUDIO_SEGMENT_LENGTH = 1
+    AUDIO_SEGMENT_LENGTH = 0.5
 
     def __new__ (self):
         # if is not define create new instance otherwise return only instance of thi class.
@@ -33,10 +33,10 @@ class ConfigManager(object):
             self._config[PROG] = {
                 'frames_per_buffer': '2048',
                 'format': '8',
-                'channels': '1',
+                'channels': '2',
                 'rate': '44100',
-                'audio_segment_length': '1',
-                'input_device_index': '2'
+                'audio_segment_length': '0.5',
+                'input_device_index': '0'
             }
 
             with open(USER_CONFIG, "w") as conf_file:

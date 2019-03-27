@@ -41,6 +41,7 @@ class NoiseObserver(object):
         self.output = StringIO()
         self.data_stats = None
         self.audio_writer = None
+        self.recorded_frames = []
 
         # Load C lib necessary for audio record.
         with noalsaerr():
@@ -87,6 +88,8 @@ class NoiseObserver(object):
             w.setframerate(self.config_manager.RATE)
             w.writeframes(b''.join(frames))
             w.close()
+
+            self.recorded_frames = list(frames)
             yield
 
     def start_monitoring(self):
@@ -138,7 +141,7 @@ class NoiseObserver(object):
             if self.log:
                 self.file_logger.info(dbSPL)
             if self.record:
-                self.audio_writer.write(recorded_data)
+                self.audio_writer.write(self.recorded_frames)
 
             # Always print data on stdout.
             sys.stdout.write('\r%10d  dbSPL' % dbSPL)
@@ -153,11 +156,9 @@ class NoiseObserver(object):
         """
         self.stream.stop_stream()
         self.audio.terminate()
-        print("FFLUSH INIT")
         if self.record:
             # Write last data on file.
             self.audio_writer.buffer_fflush()
-        print("FFLUSH ENDED")
         sys.stdout.write("\n")
 
         if self.collect:
@@ -216,7 +217,7 @@ class NoiseObserver(object):
             Method used to create file for setup record file.
         """
         create_audio_file(self.record, self.format, self.bitrate)
-        self.audio_writer = BufferedWriter(self.bitrate, self.format, self.record)
+        self.audio_writer = BufferedWriter(self.bitrate, self.format, self.record, self.audio)
 
     def convert_to_spl(self, rms):
         """

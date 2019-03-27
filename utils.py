@@ -52,9 +52,9 @@ def create_audio_file(name, format, bitrate):
     """
     if not os.path.exists(name):
         # Create an empty audio segment.
-        dumb_data = pydub.AudioSegment.silent(duration=1000)
+        dumb_data = pydub.AudioSegment.silent(duration=100)
 
-        dumb_data.export(name, format=str(format), bitrate=str(bitrate)+"k")
+        dumb_data.export(name, format=str(format))
 
 
 # Method used to detect and show audio device index.

@@ -1,4 +1,5 @@
 import pydub
+import sys
 from threading import Thread
 from utils import create_audio_file
 
@@ -29,8 +30,6 @@ class FileAudioWriter(Thread):
             self.queue.task_done()
 
     def write_on_file(self, data):
-        print("\nPrinting on file")
-
         # Convert byte data into audio segment
         new_data = pydub.AudioSegment(data)
 
@@ -41,6 +40,4 @@ class FileAudioWriter(Thread):
         merged = stored_data + new_data
 
         # Write merged audio segment on file.
-        merged.export(self.file, format=self.format, bitrate=str(self.bitrate)+"k")
-        
-        print("End printing")
+        merged.export(self.file, format=self.format)
