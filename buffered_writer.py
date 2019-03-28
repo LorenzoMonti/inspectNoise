@@ -6,7 +6,6 @@ from file_audio_writer import *
 from config_manager import ConfigManager
 
 class BufferedWriter(object):
-    c = 0
     UPPER_BOUND = 20 * 2e6 # Max dimension of buffer before writing on audio file. (20Mb)
 
     def __init__(self, bitrate, format, file_name, audio):
@@ -57,6 +56,6 @@ class BufferedWriter(object):
         data = self.buffer.getvalue()
         if data:
             self.queue.put(data)
-            
+
             # Waits until the queue is empty
             self.queue.join()

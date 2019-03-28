@@ -31,6 +31,8 @@ def parse_arguments():
     parser.add_argument('-b', '--bitrate', type=int,
                         const="256", nargs="?",
                         help="Set exportation bitrate")
+    parser.add_argument('-to', '--trashesoutput', action="store_true",
+                        help="Flag used for test, to redirect stdout on /dev/null")
 
     args = parser.parse_args()
 

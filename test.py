@@ -3,10 +3,9 @@ import os
 import subprocess
 import sys
 import ast
-import time
+import noise_observer as no
 from utils import *
 from config_manager import ConfigManager
-from noise_observer import *
 from threading import Thread
 
 class TestCli(unittest.TestCase):
@@ -105,8 +104,42 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(int(config.get_config_value("rate")), default_rate)
         self.assertEqual(float(config.get_config_value("audio_segment_length")), default_audio_seg_length)
 
+class NoiseObserver(unittest.TestCase):
+    """
+        Test noise observer main loop.
+    """
+    def setUp(self):
+        # Creates scripts for cli testing.
+        create_run_script(".test_monitoring.py", ".test_monitoring.txt")
 
+    def test_monitoring(self):
+        """
+            Test if the monitoring starts.
+        """
+        # Create runnable script.
+        # This script is used to create dictionary using cli.
+        res = subprocess.run([sys.executable, ".test_monitoring.py", "--trashesoutput"])
+        with open(".test_monitoring.txt", "r") as f:
+            kargs = ast.literal_eval(f.read())
 
+        # Passing cli as parameter.
+        del kargs["calibrate"]
+        del kargs["showindex"]
+        del kargs["setindex"]
+
+        # Used thread to start monitoring in separated flow.
+        noise_obs = no.NoiseObserver(**kargs)
+        thread = Thread(target=noise_obs.start_monitoring)
+        thread.start()
+
+        self.assertTrue(noise_obs.is_monitoring())
+        noise_obs.stop_monitoring()
+        thread.join() # Wait until thread terminate work
+        self.assertFalse(noise_obs.is_monitoring())
+        os.remove(".test_monitoring.txt")
+
+    def tearDown(self):
+        os.remove(".test_monitoring.py")
 
 if __name__ == '__main__':
     unittest.main()

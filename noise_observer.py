@@ -16,7 +16,8 @@ class NoiseObserver(object):
 
     def __init__ (self, seconds = None, log = None,
                   collect = False, record = None,
-                  bitrate = 256, format = "mp3"):
+                  bitrate = 256, format = "mp3",
+                  trashesoutput = False):
         """
             :seconds: if flag was set it is the number of seconds when we need to monitor noise.
             :log: if flag is set, it represent name of log file.
@@ -34,6 +35,7 @@ class NoiseObserver(object):
         self.record = record
         self.bitrate = bitrate
         self.format = format
+        self.trashes = trashesoutput
 
         self.is_running = False
         self.alive = True
@@ -42,6 +44,11 @@ class NoiseObserver(object):
         self.data_stats = None
         self.audio_writer = None
         self.recorded_frames = []
+
+        if self.trashes:
+            # For testing redirect output to null.
+            self.trash = open('/dev/null', 'w')
+            sys.stdout = self.trash
 
         # Load C lib necessary for audio record.
         with noalsaerr():
@@ -143,7 +150,7 @@ class NoiseObserver(object):
                 self.file_logger.info(dbSPL)
             if self.record:
                 self.audio_writer.write(self.recorded_frames.copy())
-                self.recorded_frames = []
+                del self.recorded_frames[:]
 
             # Always print data on stdout.
             sys.stdout.write('\r%10d  dbSPL' % dbSPL)
@@ -169,6 +176,11 @@ class NoiseObserver(object):
             print("Avg: {:.2f}".format(self.data_stats['avg']))
 
         sys.stdout.write("\n{}\n".format(self.end_message))
+
+        # If trashes flag was setted by user, close
+        # file (/dev/null).
+        if self.trashes:
+            self.trash.close()
 
     def stop_monitoring(self):
         """
