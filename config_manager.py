@@ -16,7 +16,7 @@ class ConfigManager(object):
     CHANNELS = 2 # check number of channel whit get_device_info_by_index(index)
     INPUT_DEVICE_INDEX = 0 # Run inspect_noise with --showindex for discover index and name of input devices.
     RATE = 44100
-    AUDIO_SEGMENT_LENGTH = 0.5 # Audio segment length recorded in seconds.
+    AUDIO_SEGMENT_LENGTH = 1 # Audio segment length recorded in seconds.
 
     def __new__ (self):
         # if is not define create new instance otherwise return only instance of thi class.
@@ -35,7 +35,7 @@ class ConfigManager(object):
                 'format': '8',
                 'channels': '2',
                 'rate': '44100',
-                'audio_segment_length': '0.5',
+                'audio_segment_length': '1',
                 'input_device_index': '0'
             }
 
@@ -61,7 +61,7 @@ class ConfigManager(object):
                     raise Exception("Param {} in configuration file not recognized".format(key))
 
             for key, value in config_items.items():
-                # Set attribute read by configuration file in the class-attribute.
+                # Set attribute read from configuration file to the class-attribute.
                 setattr(self, key.upper(), value)
 
 

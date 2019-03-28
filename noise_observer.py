@@ -165,9 +165,12 @@ class NoiseObserver(object):
         """
         self.stream.stop_stream()
         self.audio.terminate()
+
+        # If record flag was specified we need to clean buffer.
         if self.record:
             # Write last data on file.
             self.audio_writer.buffer_fflush()
+
         sys.stdout.write("\n")
 
         if self.collect:
