@@ -96,6 +96,7 @@ class NoiseObserver(object):
         """
             Method called to start monitoring.
         """
+        # Audio segment length recorded in seconds.
         segment = self.config_manager.AUDIO_SEGMENT_LENGTH
 
         # Calculate number of frames.
@@ -141,7 +142,8 @@ class NoiseObserver(object):
             if self.log:
                 self.file_logger.info(dbSPL)
             if self.record:
-                self.audio_writer.write(self.recorded_frames)
+                self.audio_writer.write(self.recorded_frames.copy())
+                self.recorded_frames = []
 
             # Always print data on stdout.
             sys.stdout.write('\r%10d  dbSPL' % dbSPL)
@@ -183,7 +185,7 @@ class NoiseObserver(object):
         self.end_message = "Time expired...\n"
         self.stop_monitoring()
 
-    def is_running(self):
+    def is_monitoring(self):
         """
             Return noise observer status.
         """

@@ -43,11 +43,11 @@ class BufferedWriter(object):
         #print("\nAudio length: " + str(sys.getsizeof(audio_segment)))
         #print("Buffer length: " + str(sys.getsizeof(self.buffer)))
 
-        #if sys.getsizeof(self.buffer) >= self.UPPER_BOUND:
-        self.queue.put(self.buffer.getvalue())
+        if sys.getsizeof(self.buffer) >= self.UPPER_BOUND:
+            self.queue.put(self.buffer.getvalue())
 
-        # Positioning index on the start of the buffer.
-        self.buffer.seek(0)
+            # Positioning index on the start of the buffer.
+            self.buffer.seek(0)
 
     def buffer_fflush(self):
         """
@@ -57,5 +57,6 @@ class BufferedWriter(object):
         data = self.buffer.getvalue()
         if data:
             self.queue.put(data)
+            
             # Waits until the queue is empty
             self.queue.join()

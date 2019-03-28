@@ -16,7 +16,7 @@ class ConfigManager(object):
     CHANNELS = 2 # check number of channel whit get_device_info_by_index(index)
     INPUT_DEVICE_INDEX = 0 # Run inspect_noise with --showindex for discover index and name of input devices.
     RATE = 44100
-    AUDIO_SEGMENT_LENGTH = 0.5
+    AUDIO_SEGMENT_LENGTH = 0.5 # Audio segment length recorded in seconds.
 
     def __new__ (self):
         # if is not define create new instance otherwise return only instance of thi class.

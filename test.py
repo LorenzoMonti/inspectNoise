@@ -3,8 +3,11 @@ import os
 import subprocess
 import sys
 import ast
+import time
 from utils import *
 from config_manager import ConfigManager
+from noise_observer import *
+from threading import Thread
 
 class TestCli(unittest.TestCase):
     """
@@ -30,6 +33,17 @@ class TestCli(unittest.TestCase):
         self.assertEqual(kargs['calibrate'], True)
         os.remove(".test_calibrate.txt")
 
+    def test_record(self):
+        """
+            Test of record flag.
+        """
+        record_file = "record.wav"
+        res = subprocess.run([sys.executable, ".test_record.py", "--record", record_file])
+        with open(".test_record.txt", "r") as f:
+            kargs = ast.literal_eval(f.read())
+        self.assertEqual(kargs['record'], record_file)
+        os.remove(".test_record.txt")
+
     def test_seconds(self):
         """
             Test of seconds flag.
@@ -51,16 +65,6 @@ class TestCli(unittest.TestCase):
         os.remove(".test_log.txt")
         os.remove(log_file)
 
-    def test_record(self):
-        """
-            Test of record flag.
-        """
-        record_file = ".record.wav"
-        res = subprocess.run([sys.executable, ".test_record.py", "--record", record_file])
-        self.assertEqual(os.path.exists(record_file), True)
-        os.remove(".test_record.txt")
-        os.remove(record_file)
-
     def tearDown(self):
         os.remove(".test_seconds.py")
         os.remove(".test_calibrate.py")
@@ -68,15 +72,41 @@ class TestCli(unittest.TestCase):
         os.remove(".test_record.py")
 
 class TestConfig(unittest.TestCase):
-
+    """
+        Test of config file reading and writing of index.
+    """
     def test_setindex(self):
         """
             Test of setindex flag and correct update of configuration file.
         """
-        index = 2
+        index = 0
         res = subprocess.run([sys.executable, "inspect_noise.py", "--setindex", str(index)])
         cnf_manager = ConfigManager()
         self.assertEqual(int(cnf_manager.get_config_value("input_device_index")), index)
+
+    def test_check_default_config_params(self):
+        """
+            Test of correct setting of default params.
+            Change this method before
+        """
+        default_frames = 2048
+        default_format = 8
+        default_channels = 2
+        default_input_device_index = 0
+        default_rate = 44100
+        default_audio_seg_length = 0.5
+
+        config = ConfigManager()
+
+        self.assertEqual(int(config.get_config_value("input_device_index")), default_input_device_index)
+        self.assertEqual(int(config.get_config_value("frames_per_buffer")), default_frames)
+        self.assertEqual(int(config.get_config_value("channels")), default_channels)
+        self.assertEqual(int(config.get_config_value("format")), default_format)
+        self.assertEqual(int(config.get_config_value("rate")), default_rate)
+        self.assertEqual(float(config.get_config_value("audio_segment_length")), default_audio_seg_length)
+
+
+
 
 if __name__ == '__main__':
     unittest.main()
