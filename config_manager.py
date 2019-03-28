@@ -49,7 +49,7 @@ class ConfigManager(object):
             self._config.read(USER_CONFIG) # Read configuration file.
 
             if not self._config.has_section(PROG):
-                raise Exception("Default section not found in configuration file")
+                raise Exception("Default section not found in configuration file.")
 
             # Extract key-values pair from file and update our configuration list.
             for key, value in self._config.items(PROG):
