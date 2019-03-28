@@ -93,7 +93,7 @@ class TestConfig(unittest.TestCase):
         default_channels = 2
         default_input_device_index = 0
         default_rate = 44100
-        default_audio_seg_length = 0.5
+        default_audio_seg_length = 1
 
         config = ConfigManager()
 
