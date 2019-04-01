@@ -7,7 +7,7 @@ from config_manager import ConfigManager
 
 class BufferedWriter(object):
     UPPER_BOUND = 20 * 1e6 # Max dimension of buffer before writing on audio file. (20Mb)
-    SIZE = 50
+    SIZE = 500
     frames = []
 
     def __init__(self, bitrate, format, file_name, audio):

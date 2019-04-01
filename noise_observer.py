@@ -80,8 +80,11 @@ class NoiseObserver(object):
             self.stream.start_stream()
             for i in range(self.num_frames):
                 # Reads FRAMES_PER_BUFFER chunks.
-                data = self.stream.read(self.config_manager.FRAMES_PER_BUFFER)
+                #try:
+                data = self.stream.read(self.config_manager.FRAMES_PER_BUFFER, exception_on_overflow = False)
                 frames.append(data)
+                #except pyaudio.paInputOverflowed:
+                #    data = '\x00' * self.config_manager.FRAMES_PER_BUFFER  # or however you choose to handle it, e.g. return None
 
             # Positioning index on the start of the buffer.
             self.output.seek(0)

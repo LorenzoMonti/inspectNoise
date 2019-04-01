@@ -11,12 +11,12 @@ class ConfigManager(object):
     _config_manager = None # Singletoon instance of this class.
     _config = None # Instance of configuration reader.
 
-    FRAMES_PER_BUFFER = 2048
+    FRAMES_PER_BUFFER = 1024 #2048
     FORMAT = pyaudio.paInt16
-    CHANNELS = 2 # check number of channel whit get_device_info_by_index(index)
+    CHANNELS = 2 #1 Usare 1 # check number of channel whit get_device_info_by_index(index)
     INPUT_DEVICE_INDEX = 0 # Run inspect_noise with --showindex for discover index and name of input devices.
     RATE = 44100
-    AUDIO_SEGMENT_LENGTH = 1 # Audio segment length recorded in seconds.
+    AUDIO_SEGMENT_LENGTH = 0.5 #1 # Audio segment length recorded in seconds.
 
     def __new__ (self):
         # if is not define create new instance otherwise return only instance of thi class.
@@ -31,11 +31,11 @@ class ConfigManager(object):
         # If configuration file doesn't exist in user dir. create it.
         if not os.path.exists(USER_CONFIG):
             self._config[PROG] = {
-                'frames_per_buffer': '2048',
-                'format': '8',
-                'channels': '2',
+                'frames_per_buffer': '1024', #2048
+                'format': '8', #8
+                'channels': '2', #1 Usare 1.
                 'rate': '44100',
-                'audio_segment_length': '1',
+                'audio_segment_length': '0.5', # 1
                 'input_device_index': '0'
             }
 
