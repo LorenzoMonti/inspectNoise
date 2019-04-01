@@ -32,7 +32,7 @@ class ConfigManager(object):
         if not os.path.exists(USER_CONFIG):
             self._config[PROG] = {
                 'frames_per_buffer': '1024', #2048
-                'format': '8', #8
+                'format': '8', # 8
                 'channels': '2', #1 Usare 1.
                 'rate': '44100',
                 'audio_segment_length': '0.5', # 1
