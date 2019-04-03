@@ -2,15 +2,10 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import sys
 import datetime
+import numpy as np
 from utils import PLOT_DIR, create_plot_dir
 
-def date_str(td):
-    """
-        Convert time delta to a string.
-    """
-    return str( str(td.seconds//3600) + ":" +     # hour
-                str((td.seconds//60)%60) + ":" +  # minutes
-                str((td.seconds//60)%60%60))      # seconds
+#my_dpi = 120
 
 def parse_file(file):
     """
@@ -28,32 +23,60 @@ def parse_file(file):
 
     return date, db, timestamps
 
-def plot(date, db, timestamps):
+def plot(date, db, timestamps, my_dpi):
     """
         Plot data.
     """
     #time_delta = timestamps[-1] - timestamps[0]
-    plt.title("Variation of dB {} \nstarted at: {} \nended at: {}".format(date, timestamps[0], timestamps[-1], "%H:%M:%S"))
-    plt.xlabel("Seconds")
-    plt.xticks(rotation=90, fontsize=6) # vertical label
-    plt.ylabel("dB")
-    plt.grid(axis="y")
+    #plt.title("Variation of dB {} \nstarted at: {} \nended at: {}".format(date, timestamps[0], timestamps[-1], "%H:%M:%S"))
+    #plt.xlabel("Seconds")
+    #plt.xticks(rotation=90, fontsize=6) # vertical label
+    #plt.ylabel("dB")
+    #plt.grid(axis="y")
+    #plt.plot(timestamps, db)
+
+    fig = plt.figure(figsize=(1920/my_dpi, 1080/my_dpi), dpi=my_dpi)
+
+    ax = fig.subplots()
+    ax.set_title("Variation of dB {} \nstarted at: {} \nended at: {}".format(date, timestamps[0], timestamps[-1], "%H:%M:%S"))
+    ax.set_xlabel("Seconds")
+    ax.set_ylabel("dB")
     plt.plot(timestamps, db)
-    plt.savefig(PLOT_DIR + "/" + str(datetime.date.today()) + '.png')
+    plt.savefig(PLOT_DIR + "/" + str(datetime.date.today()) + '.png', bbox_inches='tight', dpi=my_dpi)
+
+    #plt.savefig(PLOT_DIR + "/" + str(datetime.date.today()) + '.eps')
 
     plt.clf()
 
-def plot_dist(db):
-    plt.title("Distribution of dB {} \nstarted at: {} \nended at: {}".format(date, timestamps[0], timestamps[-1], "%H:%M:%S"))
-    db.plot.hist(50)
-    plt.xlabel("dB")
-    plt.savefig(PLOT_DIR + "/dB_distribution_" + str(datetime.date.today()) + '.png')
+def plot_dist(data, date, db, timestamps, my_dpi):
+    #plt.title("Distribution of dB {} \nstarted at: {} \nended at: {}".format(date, timestamps[0], timestamps[-1], "%H:%M:%S"))
+    #db.plot.hist(50)
+    #plt.xlabel("dB")
+
+    #fig = plt.figure(figsize=(1920/my_dpi, 1080/my_dpi), dpi=my_dpi)
+
+    #plt.savefig(PLOT_DIR + "/dB_distribution_" + str(datetime.date.today()) + '.png', bbox_inches='tight', dpi=my_dpi)
+
+    fig = plt.figure(figsize=(1920/my_dpi, 1080/my_dpi), dpi=my_dpi)
+    bins = np.linspace(10, 130, 100)
+    ax = fig.subplots()
+    ax.set_title("Distribution of dB {} \nstarted at: {} \nended at: {}".format(date, timestamps[0], timestamps[-1], "%H:%M:%S"))
+    ax.set_xlabel("dB")
+    ax.set_ylabel("Frequency")
+    plt.hist(db, bins, 50)
+    plt.savefig(PLOT_DIR + "/dB_distribution_" + str(datetime.date.today()) + '.png', bbox_inches='tight', dpi=my_dpi)
 
     plt.clf()
 
 # Call main program.
 if __name__ == "__main__":
-    nome_script, file = sys.argv
+    """
+        Main of program.
+    """
+    if len(sys.argv) != 3:
+        raise Exception("Usage: python plotter.py inputfile my_dpi")
+
+    nome_script, file, my_dpi = sys.argv
 
     # Create plot dir if it doesn't exist.
     create_plot_dir()
@@ -61,10 +84,10 @@ if __name__ == "__main__":
     date, db, timestamps = parse_file(file)
 
     # Plot data.
-    plot(date, db, timestamps)
+    plot(date, db, timestamps, int(my_dpi))
 
     # Pandas series from data.
     series = pd.Series(db)
 
     # Dist. graph.
-    plot_dist(series)
+    plot_dist(series, date, db, timestamps, int(my_dpi))
