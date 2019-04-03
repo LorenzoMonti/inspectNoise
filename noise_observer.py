@@ -33,15 +33,15 @@ class NoiseObserver(object):
         self.seconds = seconds
         self.collect = collect
         self.record = record
+        self.trashes = trashesoutput
         if not bitrate:
-            self.bitrate = 256
+            self.bitrate = 256 # Default value.
         else:
             self.bitrate = bitrate
         if not format:
-            self.format = "mp3"
+            self.format = "mp3" # Default value.
         else:
             self.format = format
-        self.trashes = trashesoutput
 
         self.is_running = False
         self.alive = True
@@ -86,11 +86,8 @@ class NoiseObserver(object):
             self.stream.start_stream()
             for i in range(self.num_frames):
                 # Reads FRAMES_PER_BUFFER chunks.
-                #try:
                 data = self.stream.read(self.config_manager.FRAMES_PER_BUFFER, exception_on_overflow = False)
                 frames.append(data)
-                #except pyaudio.paInputOverflowed:
-                #    data = '\x00' * self.config_manager.FRAMES_PER_BUFFER  # or however you choose to handle it, e.g. return None
 
             # Positioning index on the start of the buffer.
             self.output.seek(0)

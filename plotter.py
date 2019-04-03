@@ -21,8 +21,9 @@ def parse_file(file):
     with open(file, "rt") as f:
         for line in f:
             date, time, val = line.split(" ")
-            tmp_date = datetime.datetime.strptime(time, "%H:%M:%S,%f")
-            timestamps.append(tmp_date.strftime("%H:%M:%S"))
+            tmp_time = datetime.datetime.strptime(time, "%H:%M:%S,%f").time()
+            time = datetime.time(hour=tmp_time.hour, minute=tmp_time.minute, second=tmp_time.second)
+            timestamps.append(time);
             db.append(float(val))
 
     return date, db, timestamps
@@ -32,21 +33,20 @@ def plot(date, db, timestamps):
         Plot data.
     """
     #time_delta = timestamps[-1] - timestamps[0]
-    plt.title("Variation of db {} \nstarted at: {} \nended at: {}".format(date, timestamps[0], timestamps[-1]))
+    plt.title("Variation of dB {} \nstarted at: {} \nended at: {}".format(date, timestamps[0], timestamps[-1], "%H:%M:%S"))
     plt.xlabel("Seconds")
     plt.xticks(rotation=90, fontsize=6) # vertical label
     plt.ylabel("dB")
     plt.grid(axis="y")
     plt.plot(timestamps, db)
-    #plt.legend()
     plt.savefig(PLOT_DIR + "/" + str(datetime.date.today()) + '.png')
 
     plt.clf()
 
 def plot_dist(db):
+    plt.title("Distribution of dB {} \nstarted at: {} \nended at: {}".format(date, timestamps[0], timestamps[-1], "%H:%M:%S"))
     db.plot.hist(50)
     plt.xlabel("dB")
-    #plt.legend()
     plt.savefig(PLOT_DIR + "/dB_distribution_" + str(datetime.date.today()) + '.png')
 
     plt.clf()
@@ -64,8 +64,7 @@ if __name__ == "__main__":
     plot(date, db, timestamps)
 
     # Pandas series from data.
-    series = pd.Series(db.copy())
-    #print(series)
+    series = pd.Series(db)
 
-    #Grafico sulla distribuzione.
+    # Dist. graph.
     plot_dist(series)
