@@ -49,6 +49,8 @@ def plot_dist(db):
     #plt.legend()
     plt.savefig(PLOT_DIR + "/dB_distribution_" + str(datetime.date.today()) + '.png')
 
+    plt.clf()
+
 # Call main program.
 if __name__ == "__main__":
     nome_script, file = sys.argv

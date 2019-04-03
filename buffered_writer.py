@@ -62,7 +62,7 @@ class BufferedWriter(object):
 
         # PROVA BUFF List
         if len(self.frames) >= self.SIZE:
-            print("\n\tMax list size reached...")
+            #print("\n\tMax list size reached...")
             self.queue.put(self.frames.copy())
             del self.frames[:]
 

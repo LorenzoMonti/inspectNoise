@@ -16,7 +16,7 @@ class NoiseObserver(object):
 
     def __init__ (self, seconds = None, log = None,
                   collect = False, record = None,
-                  bitrate = 256, format = "mp3",
+                  bitrate = None, format = None,
                   trashesoutput = False):
         """
             :seconds: if flag was set it is the number of seconds when we need to monitor noise.
@@ -33,8 +33,14 @@ class NoiseObserver(object):
         self.seconds = seconds
         self.collect = collect
         self.record = record
-        self.bitrate = bitrate
-        self.format = format
+        if not bitrate:
+            self.bitrate = 256
+        else:
+            self.bitrate = bitrate
+        if not format:
+            self.format = "mp3"
+        else:
+            self.format = format
         self.trashes = trashesoutput
 
         self.is_running = False
