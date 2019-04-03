@@ -35,7 +35,9 @@ class FileAudioWriter(Thread):
 
             self.write_on_file(data)
 
-            self.queue.task_done()
+            # Thread set task done only if queue is empty.
+            if self.queue.empty():
+                self.queue.task_done()
 
     def write_on_file(self, data):
         # Convert byte data into audio segment
@@ -50,7 +52,7 @@ class FileAudioWriter(Thread):
         # Write merged audio segment on file.
         #merged.export(self.file, format=self.format)
         #new_data.export(fname, format=self.format)
-        print("\n\t Printing on file")
+        #print("\n\t Printing on file")
 
         # StringIO passed as first param to write into memory buffer.
         w = wave.open(self.recorder, 'wb')

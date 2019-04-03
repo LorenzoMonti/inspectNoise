@@ -88,7 +88,7 @@ class TestConfig(unittest.TestCase):
             Test of correct setting of default params.
             Change this method before
         """
-        default_frames = 2048
+        default_frames = 1024
         default_format = 8
         default_channels = 2
         default_input_device_index = 0

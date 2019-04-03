@@ -7,7 +7,7 @@ from config_manager import ConfigManager
 
 class BufferedWriter(object):
     UPPER_BOUND = 20 * 1e6 # Max dimension of buffer before writing on audio file. (20Mb)
-    SIZE = 500
+    SIZE = 1000
     frames = []
 
     def __init__(self, bitrate, format, file_name, audio):
@@ -83,7 +83,7 @@ class BufferedWriter(object):
 
             # Waits until the queue is empty
         #    self.queue.join()
-        print("\n\t fflush")
+        #print("\n\t fflush")
         if len(self.frames) > 0:
             self.queue.put(self.frames.copy())
             self.queue.join()

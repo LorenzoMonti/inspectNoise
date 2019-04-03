@@ -114,9 +114,6 @@ class NoiseObserver(object):
         # Our sampling rate is 44100 (elements for each seconds).
         # If we divide our sampling rate for the number of frame in buffer we have the number of
         # buffer necessary to contain our samplings.
-        # We use 2 CHANNELS so we have for each sampling 2 value replied, indeed we multiply this number for 0,5 (SEGMENT).
-        # If we double channels number we have to divide by 4 the segment (0,25), because the set of useful value is 4 times
-        # smaller.
         #
         # See: https://stackoverflow.com/questions/35970282/what-are-chunks-samples-and-frames-when-using-pyaudio
         self.num_frames = int(self.config_manager.RATE / self.config_manager.FRAMES_PER_BUFFER * segment)
