@@ -219,7 +219,7 @@ class NoiseObserver(object):
         if self.data_stats:
             self.data_stats['min'] = min(dbSPL, self.data_stats['min'])
             self.data_stats['max'] = max(dbSPL, self.data_stats['max'])
-            self.data_stats['avg'] = dbSPL + self.data_stats['avg'] / 2
+            self.data_stats['avg'] = (dbSPL + self.data_stats['avg']) / 2
         else:
             self.data_stats['min'] = dbSPL
             self.data_stats['max'] = dbSPL

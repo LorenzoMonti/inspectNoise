@@ -63,7 +63,6 @@ def create_audio_file(name, format, bitrate):
 
         dumb_data.export(name, format=format)
 
-
 # Method used to detect and show audio device index.
 # Thanks to: https://stackoverflow.com/questions/36894315/how-to-select-a-specific-input-device-with-pyaudio
 def show_device_index_list():
@@ -76,6 +75,8 @@ def show_device_index_list():
     for i in range(0, numdevices):
         if (p.get_device_info_by_host_api_device_index(0, i).get('maxInputChannels')) > 0:
             print("Input Device id ", i, " - ", p.get_device_info_by_host_api_device_index(0, i).get('name'))
+    #for index, name in enumerate(sr.Microphone.list_microphone_names()):
+    #    print("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
 
 # Work-around on error messages by alsa-lib
 # http://stackoverflow.com/questions/7088672/
