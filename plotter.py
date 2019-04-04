@@ -58,7 +58,7 @@ def plot_dist(data, date, db, timestamps, my_dpi):
     #plt.savefig(PLOT_DIR + "/dB_distribution_" + str(datetime.date.today()) + '.png', bbox_inches='tight', dpi=my_dpi)
 
     fig = plt.figure(figsize=(1920/my_dpi, 1080/my_dpi), dpi=my_dpi)
-    bins = np.linspace(10, 130, 100)
+    bins = np.linspace(30, 130, 100)
     ax = fig.subplots()
     ax.set_title("Distribution of dB {} \nstarted at: {} \nended at: {}".format(date, timestamps[0], timestamps[-1], "%H:%M:%S"))
     ax.set_xlabel("dB")
