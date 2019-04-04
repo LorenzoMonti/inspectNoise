@@ -17,7 +17,7 @@ def main():
     conf_manager = ConfigManager()
 
     kargs = get_args()
-    #print(kargs)
+    #print(kargs) # DEBUG print.
 
     # If one of these three flags is used on program we run correct function;
     # otherwhise run instance of NoiseObserver.

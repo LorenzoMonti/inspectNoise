@@ -27,16 +27,7 @@ def plot(date, db, timestamps, my_dpi):
     """
         Plot data.
     """
-    #time_delta = timestamps[-1] - timestamps[0]
-    #plt.title("Variation of dB {} \nstarted at: {} \nended at: {}".format(date, timestamps[0], timestamps[-1], "%H:%M:%S"))
-    #plt.xlabel("Seconds")
-    #plt.xticks(rotation=90, fontsize=6) # vertical label
-    #plt.ylabel("dB")
-    #plt.grid(axis="y")
-    #plt.plot(timestamps, db)
-
     fig = plt.figure(figsize=(1920/my_dpi, 1080/my_dpi), dpi=my_dpi)
-
     ax = fig.subplots()
     ax.set_title("Variation of dB {} \nstarted at: {} \nended at: {}".format(date, timestamps[0], timestamps[-1], "%H:%M:%S"))
     ax.set_xlabel("Seconds")
@@ -44,19 +35,12 @@ def plot(date, db, timestamps, my_dpi):
     plt.plot(timestamps, db)
     plt.savefig(PLOT_DIR + "/" + str(datetime.date.today()) + '.png', bbox_inches='tight', dpi=my_dpi)
 
-    #plt.savefig(PLOT_DIR + "/" + str(datetime.date.today()) + '.eps')
-
     plt.clf()
 
 def plot_dist(data, date, db, timestamps, my_dpi):
-    #plt.title("Distribution of dB {} \nstarted at: {} \nended at: {}".format(date, timestamps[0], timestamps[-1], "%H:%M:%S"))
-    #db.plot.hist(50)
-    #plt.xlabel("dB")
-
-    #fig = plt.figure(figsize=(1920/my_dpi, 1080/my_dpi), dpi=my_dpi)
-
-    #plt.savefig(PLOT_DIR + "/dB_distribution_" + str(datetime.date.today()) + '.png', bbox_inches='tight', dpi=my_dpi)
-
+    """
+        Plot distribution of dB.
+    """
     fig = plt.figure(figsize=(1920/my_dpi, 1080/my_dpi), dpi=my_dpi)
     bins = np.linspace(30, 130, 100)
     ax = fig.subplots()

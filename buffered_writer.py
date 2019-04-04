@@ -40,6 +40,7 @@ class BufferedWriter(object):
         #w.writeframes(b''.join(audio_segment))
         #w.close()
 
+        # Append to a list recorded frames.
         self.frames.append(audio_frames)
         # Debug print.
         #print("\nAudio length: " + str(sys.getsizeof(audio_segment)))
@@ -60,9 +61,9 @@ class BufferedWriter(object):
         #    self.buffer.seek(0)
 
 
-        # PROVA BUFF List
+        # If list reached max size, put data in a thread buffer for
+        # writing on audio file.
         if len(self.frames) >= self.SIZE:
-            #print("\n\tMax list size reached...")
             self.queue.put(self.frames.copy())
             del self.frames[:]
 
@@ -84,6 +85,8 @@ class BufferedWriter(object):
             # Waits until the queue is empty
         #    self.queue.join()
         #print("\n\t fflush")
+
+        # Flush buffer data.
         if len(self.frames) > 0:
             self.queue.put(self.frames.copy())
             self.queue.join()

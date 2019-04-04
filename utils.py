@@ -58,7 +58,7 @@ def create_audio_file(name, format, bitrate):
         Method used to crate empty audio file.
     """
     if not os.path.exists(name):
-        # Create an empty audio segment.
+        # Create a dumb audio segment.
         dumb_data = pydub.AudioSegment.silent(duration=100)
 
         dumb_data.export(name, format=format)

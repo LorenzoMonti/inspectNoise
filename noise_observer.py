@@ -34,6 +34,7 @@ class NoiseObserver(object):
         self.collect = collect
         self.record = record
         self.trashes = trashesoutput
+
         if not bitrate:
             self.bitrate = 256 # Default value.
         else:
@@ -86,6 +87,7 @@ class NoiseObserver(object):
             self.stream.start_stream()
             for i in range(self.num_frames):
                 # Reads FRAMES_PER_BUFFER chunks.
+                # Second param allow to avoid input overflow exceptions.
                 data = self.stream.read(self.config_manager.FRAMES_PER_BUFFER, exception_on_overflow = False)
                 frames.append(data)
 
@@ -95,13 +97,14 @@ class NoiseObserver(object):
             # StringIO passed as first param to write into memory buffer.
             w = wave.open(self.output, 'wb')
 
-            # Setting params of wav.
+            # Setting params of wav and write frames on memory.
             w.setnchannels(self.config_manager.CHANNELS)
             w.setsampwidth(self.audio.get_sample_size(self.config_manager.FORMAT))
             w.setframerate(self.config_manager.RATE)
             w.writeframes(b''.join(frames))
             w.close()
 
+            # Collect frames into list used to record audio.
             self.recorded_frames = list(frames)
             yield
 
@@ -145,7 +148,7 @@ class NoiseObserver(object):
             recorded_data = self.output.getvalue() # Getting value writed in memory buffer by record.
             segment = pydub.AudioSegment(recorded_data) # Created audio segment by data recorded.
 
-            dbSPL = self.convert_to_spl(segment.rms) # Getting value of dbSPL by pydub.
+            dbSPL = self.convert_to_spl(segment.rms) # Convert rms in dbSPL.
 
             if self.collect:
                 self.collect_data(dbSPL)
@@ -236,6 +239,7 @@ class NoiseObserver(object):
         """
             Method used to create file for setup record file.
         """
+        # Create audio file used as base to record.
         create_audio_file(self.record, self.format, self.bitrate)
         self.audio_writer = BufferedWriter(self.bitrate, self.format, self.record, self.audio)
 
