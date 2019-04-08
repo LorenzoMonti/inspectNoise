@@ -4,8 +4,8 @@ import sys
 import datetime
 import numpy as np
 from utils import PLOT_DIR, create_plot_dir
-
-#my_dpi = 120
+import matplotlib.ticker as ticker
+import matplotlib.dates as mdates
 
 def parse_file(file):
     """
@@ -16,9 +16,11 @@ def parse_file(file):
     with open(file, "rt") as f:
         for line in f:
             date, time, val = line.split(" ")
-            tmp_time = datetime.datetime.strptime(time, "%H:%M:%S,%f").time()
-            time = datetime.time(hour=tmp_time.hour, minute=tmp_time.minute, second=tmp_time.second)
-            timestamps.append(time);
+            tmp_date = date + " " +time
+            #print(tmp_date)
+            tmp_time = datetime.datetime.strptime(tmp_date, "%Y-%m-%d %H:%M:%S,%f")#.time()
+            #time = datetime.time(hour=tmp_time.hour, minute=tmp_time.minute, second=tmp_time.second)
+            timestamps.append(tmp_time);
             db.append(float(val))
 
     return date, db, timestamps
@@ -29,9 +31,13 @@ def plot(date, db, timestamps, my_dpi):
     """
     fig = plt.figure(figsize=(1920/my_dpi, 1080/my_dpi), dpi=my_dpi)
     ax = fig.subplots()
-    ax.set_title("Variation of dB {} \nstarted at: {} \nended at: {}".format(date, timestamps[0], timestamps[-1], "%H:%M:%S"))
+    ax.set_title("Variation of dB {} \nstarted at: {} \nended at: {}".format(date, datetime.datetime.strftime(timestamps[0], "%H:%M:%S"), datetime.datetime.strftime(timestamps[-1], "%H:%M:%S")))
     ax.set_xlabel("Seconds")
     ax.set_ylabel("dB")
+    #ax.set_xticks(timestamps)
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M:%S"))
+    #ax.xaxis.set_minor_formatter(mdates.DateFormatter("%H:%M:%S"))
+    #_=plt.xticks(rotation=90)
     plt.plot(timestamps, db)
     plt.savefig(PLOT_DIR + "/" + str(datetime.date.today()) + '.png', bbox_inches='tight', dpi=my_dpi)
 
@@ -44,7 +50,7 @@ def plot_dist(data, date, db, timestamps, my_dpi):
     fig = plt.figure(figsize=(1920/my_dpi, 1080/my_dpi), dpi=my_dpi)
     bins = np.linspace(30, 130, 100)
     ax = fig.subplots()
-    ax.set_title("Distribution of dB {} \nstarted at: {} \nended at: {}".format(date, timestamps[0], timestamps[-1], "%H:%M:%S"))
+    ax.set_title("Distribution of dB {} \nstarted at: {} \nended at: {}".format(date, datetime.datetime.strftime(timestamps[0], "%H:%M:%S"), datetime.datetime.strftime(timestamps[-1], "%H:%M:%S")))
     ax.set_xlabel("dB")
     ax.set_ylabel("Frequency")
     plt.hist(db, bins, 50)
