@@ -16,14 +16,12 @@ class NoiseObserver(object):
 
     def __init__ (self, seconds = None, log = None,
                   collect = False, record = None,
-                  bitrate = None, format = None,
-                  trashesoutput = False):
+                  format = None, trashesoutput = False):
         """
             :seconds: if flag was set it is the number of seconds when we need to monitor noise.
             :log: if flag is set, it represent name of log file.
             :collect: if this flag is set we need to collect and calculate min, max avg of data.
             :record: if this flag is set contains the name of audio file into record.
-            :bitrate: if this flag is set contains the bitrate for printing file.
             :format: if is set contains export format.
         """
         self.config_manager = ConfigManager() # Get singletoon instance of configuration manager.
@@ -35,10 +33,10 @@ class NoiseObserver(object):
         self.record = record
         self.trashes = trashesoutput
 
-        if not bitrate:
-            self.bitrate = 256 # Default value.
-        else:
-            self.bitrate = bitrate
+        #if not bitrate:
+        #    self.bitrate = 256 # Default value.
+        #else:
+        #    self.bitrate = bitrate
         if not format:
             self.format = "mp3" # Default value.
         else:
@@ -240,8 +238,8 @@ class NoiseObserver(object):
             Method used to create file for setup record file.
         """
         # Create audio file used as base to record.
-        create_audio_file(self.record, self.format, self.bitrate)
-        self.audio_writer = BufferedWriter(self.bitrate, self.format, self.record, self.audio)
+        create_audio_file(self.record, self.format)
+        self.audio_writer = BufferedWriter(self.format, self.record, self.audio)
 
     def convert_to_spl(self, rms):
         """

@@ -10,13 +10,13 @@ class BufferedWriter(object):
     SIZE = 1000
     frames = []
 
-    def __init__(self, bitrate, format, file_name, audio):
+    def __init__(self, format, file_name, audio):
         """
             Constructor for this class.
         """
         self.buffer = StringIO()
         self.queue = Queue()
-        self.worker = FileAudioWriter(self.queue, bitrate, format, file_name, audio)
+        self.worker = FileAudioWriter(self.queue, format, file_name, audio)
         self.worker.daemon = True
         self.worker.start()
 
