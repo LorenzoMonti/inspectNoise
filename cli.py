@@ -36,13 +36,13 @@ def parse_arguments():
 
     args = parser.parse_args()
 
-    if args.calibrate and (args.log or args.record or args.seconds or args.collect or args.showindex or args.setindex or args.format or args.bitrate):
+    if args.calibrate and (args.log or args.record or args.seconds or args.collect or args.showindex or args.setindex or args.format or args.bitrate or args.trashesoutput):
         raise parser.error("Calibrate flag can't be used with others flags")
 
-    if args.showindex and (args.log or args.record or args.seconds or args.collect or args.calibrate or args.setindex or args.format or args.bitrate):
+    if args.showindex and (args.log or args.record or args.seconds or args.collect or args.calibrate or args.setindex or args.format or args.bitrate or args.trashesoutput):
         raise parser.error("Show index flag can't be used with others flags")
 
-    if args.setindex and (args.log or args.record or args.seconds or args.collect or args.calibrate or args.showindex or args.format or args.bitrate):
+    if args.setindex and (args.log or args.record or args.seconds or args.collect or args.calibrate or args.showindex or args.format or args.bitrate or args.trashesoutput):
         raise parser.error("Set index flag can't be used with others flags")
 
     if args.seconds:
