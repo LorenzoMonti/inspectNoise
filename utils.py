@@ -11,7 +11,7 @@ USER_DIR = os.path.join(os.path.expanduser('~'), '.' + PROG)
 USER_LOGFILE = os.path.join(USER_DIR, 'log.log')
 USER_CONFIG = os.path.join(USER_DIR, 'config.cnf')
 USER_RECORDFILE = os.path.join(USER_DIR, 'record.mp3')
-PLOT_DIR = USER_LOGFILE = os.path.join(USER_DIR, 'plot_data')
+PLOT_DIR = os.path.join(USER_DIR, 'plot_data')
 
 d = os.path.dirname(__file__)
 PROJECT_PATH = os.path.abspath(d)
