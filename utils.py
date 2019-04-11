@@ -53,7 +53,7 @@ def create_plot_dir():
     if not os.path.exists(PLOT_DIR):
         os.makedirs(PLOT_DIR)
 
-def create_audio_file(name, format, bitrate):
+def create_audio_file(name, format):
     """
         Method used to crate empty audio file.
     """

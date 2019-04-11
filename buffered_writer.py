@@ -7,7 +7,7 @@ from config_manager import ConfigManager
 
 class BufferedWriter(object):
     #UPPER_BOUND = 20 * 1e6 # Max dimension of buffer before writing on audio file. (20Mb)
-    SIZE = 1000
+    SIZE = 500
     frames = []
 
     def __init__(self, format, file_name, audio):
@@ -49,7 +49,6 @@ class BufferedWriter(object):
         #print("\n" + str(self.UPPER_BOUND))
 
         #if sys.getsizeof(self.buffer) >= self.UPPER_BOUND:
-        #    print("Buffer overflow.")
 
         #    self.queue.put(self.buffer.getvalue())
 
@@ -64,8 +63,10 @@ class BufferedWriter(object):
         # If list reached max size, put data in a thread buffer for
         # writing on audio file.
         if len(self.frames) >= self.SIZE:
+            print("\n\tBuffer overflow.")
             self.queue.put(self.frames.copy())
-            del self.frames[:]
+            self.frames.clear()
+            #del self.frames[:]
 
         #PROVA SINGOLI
         #self.queue.put((self.buffer.getvalue(), self.PATH+str(self.c)+".mp3"))
@@ -84,7 +85,7 @@ class BufferedWriter(object):
 
             # Waits until the queue is empty
         #    self.queue.join()
-        #print("\n\t fflush")
+        print("\n\tfflush")
 
         # Flush buffer data.
         if len(self.frames) > 0:

@@ -103,7 +103,7 @@ class NoiseObserver(object):
             w.close()
 
             # Collect frames into list used to record audio.
-            self.recorded_frames = list(frames)
+            self.recorded_frames = frames #list(frames)
             yield
 
     def start_monitoring(self):
@@ -154,7 +154,7 @@ class NoiseObserver(object):
                 self.file_logger.info(dbSPL)
             if self.record:
                 self.audio_writer.write(self.recorded_frames.copy())
-                del self.recorded_frames[:]
+                #del self.recorded_frames[:]
 
             # Always print data on stdout.
             sys.stdout.write('\r%10d  dbSPL' % dbSPL)

@@ -50,8 +50,8 @@ class FileAudioWriter(Thread):
         # Write merged audio segment on file.
         #merged.export(self.file, format=self.format)
         #new_data.export(fname, format=self.format)
-        #print("\n\t Printing on file")
-
+        print("\n\t Printing on file")
+        print("In memory Wav")
         # StringIO passed as first param to write into memory buffer.
         w = wave.open(self.recorder, 'wb')
 
@@ -64,13 +64,13 @@ class FileAudioWriter(Thread):
             w.writeframes(b''.join(frame))
 
         w.close()
-
+        print("Create audio segment")
         new_data = pydub.AudioSegment(self.recorder.getvalue())
-
+        print("Import file")
         stored_data = pydub.AudioSegment.from_file(self.file, format=self.format)
-
+        print("Merging")
         merged = stored_data + new_data
-
+        print("Export")
         merged.export(self.file, format=self.format)
 
         self.recorder.seek(0)
