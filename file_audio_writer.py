@@ -2,14 +2,15 @@ import pydub
 import sys
 import os
 import wave
+import time
 from threading import Thread
-from utils import create_audio_file
+from utils import AUDIO_DIR
 from config_manager import ConfigManager
 from io import BytesIO
 
 class FileAudioWriter(Thread):
 
-    def __init__(self, queue, format, file, audio):
+    def __init__(self, queue, format, file, audio, record_dir):
         """
             Constructor.
             :queue: global queue used to communicate with buffered writer.
@@ -25,6 +26,7 @@ class FileAudioWriter(Thread):
 
         self.config = ConfigManager()
         self.audio = audio
+        self.record_dir = record_dir
 
     def run(self):
         while True:
@@ -50,8 +52,7 @@ class FileAudioWriter(Thread):
         # Write merged audio segment on file.
         #merged.export(self.file, format=self.format)
         #new_data.export(fname, format=self.format)
-        print("\n\t Printing on file")
-        print("In memory Wav")
+        print("\n\tPrinting on file")
         # StringIO passed as first param to write into memory buffer.
         w = wave.open(self.recorder, 'wb')
 
@@ -64,13 +65,18 @@ class FileAudioWriter(Thread):
             w.writeframes(b''.join(frame))
 
         w.close()
-        print("Create audio segment")
+
         new_data = pydub.AudioSegment(self.recorder.getvalue())
-        print("Import file")
-        stored_data = pydub.AudioSegment.from_file(self.file, format=self.format)
-        print("Merging")
-        merged = stored_data + new_data
-        print("Export")
-        merged.export(self.file, format=self.format)
+
+        file_name = str(int(time.time())) #time.strftime("%Y%m%d-%H%M%S")
+
+        file_path = os.path.join(self.record_dir, file_name + "." +self.format)
+        #stored_data = pydub.AudioSegment.from_file(self.file, format=self.format)
+
+        #merged = stored_data + new_data
+
+        #merged.export(self.file, format=self.format)
+
+        new_data.export(file_path, format=self.format)
 
         self.recorder.seek(0)

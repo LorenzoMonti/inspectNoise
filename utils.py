@@ -3,6 +3,7 @@ from ctypes import *
 import stat
 import pyaudio
 import pydub
+import datetime
 from contextlib import contextmanager
 
 # Glabal variables used by all program.
@@ -12,6 +13,7 @@ USER_LOGFILE = os.path.join(USER_DIR, 'log.log')
 USER_CONFIG = os.path.join(USER_DIR, 'config.cnf')
 USER_RECORDFILE = os.path.join(USER_DIR, 'record.mp3')
 PLOT_DIR = os.path.join(USER_DIR, 'plot_data')
+AUDIO_DIR = os.path.join(USER_DIR, 'gathered_mp3')
 
 d = os.path.dirname(__file__)
 PROJECT_PATH = os.path.abspath(d)
@@ -53,15 +55,28 @@ def create_plot_dir():
     if not os.path.exists(PLOT_DIR):
         os.makedirs(PLOT_DIR)
 
-def create_audio_file(name, format):
-    """
-        Method used to crate empty audio file.
-    """
-    if not os.path.exists(name):
+#def create_audio_file(name, format):
+#    """
+#        Method used to crate empty audio file.
+#    """
+#    if not os.path.exists(name):
         # Create a dumb audio segment.
-        dumb_data = pydub.AudioSegment.silent(duration=100)
+#        dumb_data = pydub.AudioSegment.silent(duration=100)
 
-        dumb_data.export(name, format=format)
+#        dumb_data.export(name, format=format)
+
+def create_audio_dir():
+    """
+        Method used to create audio dir.
+    """
+    if not os.path.exists(AUDIO_DIR):
+        os.makedirs(AUDIO_DIR)
+
+    day_dir = os.path.join(AUDIO_DIR, str(datetime.date.today()))
+    if not os.path.exists(day_dir):
+        os.makedirs(day_dir)
+
+    return day_dir
 
 # Method used to detect and show audio device index.
 # Thanks to: https://stackoverflow.com/questions/36894315/how-to-select-a-specific-input-device-with-pyaudio
@@ -75,8 +90,6 @@ def show_device_index_list():
     for i in range(0, numdevices):
         if (p.get_device_info_by_host_api_device_index(0, i).get('maxInputChannels')) > 0:
             print("Input Device id ", i, " - ", p.get_device_info_by_host_api_device_index(0, i).get('name'))
-    #for index, name in enumerate(sr.Microphone.list_microphone_names()):
-    #    print("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
 
 # Work-around on error messages by alsa-lib
 # http://stackoverflow.com/questions/7088672/

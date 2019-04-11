@@ -9,7 +9,7 @@ import sys
 import numpy as np
 from config_manager import ConfigManager
 from io import BytesIO as StringIO
-from utils import noalsaerr, coroutine
+from utils import noalsaerr, coroutine, create_audio_dir
 from buffered_writer import *
 
 class NoiseObserver(object):
@@ -238,8 +238,8 @@ class NoiseObserver(object):
             Method used to create file for setup record file.
         """
         # Create audio file used as base to record.
-        create_audio_file(self.record, self.format)
-        self.audio_writer = BufferedWriter(self.format, self.record, self.audio)
+        self.record_dir = create_audio_dir()
+        self.audio_writer = BufferedWriter(self.format, self.record, self.audio, self.record_dir)
 
     def convert_to_spl(self, rms):
         """
