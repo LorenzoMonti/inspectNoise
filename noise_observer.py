@@ -15,7 +15,7 @@ from buffered_writer import *
 class NoiseObserver(object):
 
     def __init__ (self, seconds = None, log = None,
-                  collect = False, record = None,
+                  collect = False, record = False,
                   format = None, trashesoutput = False):
         """
             :seconds: if flag was set it is the number of seconds when we need to monitor noise.
@@ -131,7 +131,7 @@ class NoiseObserver(object):
         if self.collect:
             print("Collectiong db values...")
         if self.record:
-            print("Record values on audio file {}...".format(self.record))
+            print("Record values on audio files in ~/.inspectNoise/gathered_mp3/...")
         if self.log:
             print("Write values on a log file {}...".format(self.log.name))
 

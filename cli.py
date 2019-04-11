@@ -1,5 +1,5 @@
 import argparse
-from utils import USER_LOGFILE, USER_CONFIG, USER_RECORDFILE
+from utils import USER_LOGFILE, USER_CONFIG
 
 def parse_arguments():
     """
@@ -12,10 +12,10 @@ def parse_arguments():
                         type=argparse.FileType('w'),
                         const=USER_LOGFILE, # used to create file if user don't specify filename.
                         help="Write data on file as text")
-    parser.add_argument('-r', '--record', nargs="?",
-                        type=str,
-                        const=USER_RECORDFILE, # used to create file if user don't specify filename.
-                        help="Write data on file as audio")
+    parser.add_argument('-r', '--record',
+                        action="store_true",
+                        #const=USER_RECORDFILE, # used to create file if user don't specify filename.
+                        help="Write data on files as audio")
     parser.add_argument('-s', '--seconds',
                         type=int,
                         help="Time during record data")
