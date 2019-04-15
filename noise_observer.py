@@ -165,7 +165,7 @@ class NoiseObserver(object):
 
     def close_stream(self):
         """
-            Method called after eneded monitoring.
+            Method called after monitoring ending.
         """
         self.stream.stop_stream()
         self.audio.terminate()
