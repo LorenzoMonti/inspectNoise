@@ -42,7 +42,7 @@ def plot(date, db, timestamps, my_dpi, thr):
 
     plt.clf()
 
-def plot_dist(data, date, db, timestamps, my_dpi):
+def plot_dist(data, date, db, timestamps, my_dpi, thr):
     """
         Plot distribution of dB.
     """
@@ -52,6 +52,8 @@ def plot_dist(data, date, db, timestamps, my_dpi):
     ax.set_title("Distribution of dB {} \nstarted at: {} \nended at: {}".format(date, datetime.datetime.strftime(timestamps[0], "%H:%M:%S"), datetime.datetime.strftime(timestamps[-1], "%H:%M:%S")))
     ax.set_xlabel("dB")
     ax.set_ylabel("Frequency")
+    if thr > 0:
+         plt.axvline(thr, color='red', linewidth=2)
     plt.hist(db, bins, 50)
     plt.savefig(PLOT_DIR + "/dB_distribution_" + str(datetime.date.today()) + '.png', bbox_inches='tight', dpi=my_dpi)
 
@@ -84,4 +86,4 @@ if __name__ == "__main__":
     series = pd.Series(db)
 
     # Dist. graph.
-    plot_dist(series, date, db, timestamps, int(my_dpi))
+    plot_dist(series, date, db, timestamps, int(my_dpi), float(thr))
