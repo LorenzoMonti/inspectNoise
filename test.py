@@ -36,11 +36,11 @@ class TestCli(unittest.TestCase):
         """
             Test of record flag.
         """
-        record_file = "record.wav"
-        res = subprocess.run([sys.executable, ".test_record.py", "--record", record_file])
+        record_thr = 100
+        res = subprocess.run([sys.executable, ".test_record.py", "--record", str(record_thr)])
         with open(".test_record.txt", "r") as f:
             kargs = ast.literal_eval(f.read())
-        self.assertEqual(kargs['record'], record_file)
+        self.assertEqual(kargs['record'], record_thr)
         os.remove(".test_record.txt")
 
     def test_seconds(self):

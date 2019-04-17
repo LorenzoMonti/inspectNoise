@@ -14,8 +14,10 @@ from buffered_writer import *
 
 class NoiseObserver(object):
 
+    SEC = 10 # Dimension in seconds of window.
+
     def __init__ (self, seconds = None, log = None,
-                  collect = False, record = False,
+                  collect = False, record = None,
                   format = None, trashesoutput = False):
         """
             :seconds: if flag was set it is the number of seconds when we need to monitor noise.
@@ -30,7 +32,7 @@ class NoiseObserver(object):
         self.log = log
         self.seconds = seconds
         self.collect = collect
-        self.record = record
+        self.record_thr = record
         self.trashes = trashesoutput
 
         #if not bitrate:
@@ -72,7 +74,7 @@ class NoiseObserver(object):
             self.setup_log()
         if self.collect:
             self.data_stats = dict()
-        if self.record:
+        if self.record_thr:
             self.setup_record()
 
     @coroutine
@@ -130,8 +132,8 @@ class NoiseObserver(object):
 
         if self.collect:
             print("Collectiong db values...")
-        if self.record:
-            print("Record values on audio files in ~/.inspectNoise/gathered_mp3/...")
+        if self.record_thr:
+            print("Record values on audio files in ~/.inspectNoise/gathered_mp3/ with treshold fixed to {}...".format(self.record_thr))
         if self.log:
             print("Write values on a log file {}...".format(self.log.name))
 
@@ -152,8 +154,8 @@ class NoiseObserver(object):
                 self.collect_data(dbSPL)
             if self.log:
                 self.file_logger.info(dbSPL)
-            if self.record:
-                self.audio_writer.write(self.recorded_frames.copy())
+            if self.record_thr:
+                self.record_action(dbSPL)
                 #del self.recorded_frames[:]
 
             # Always print data on stdout.
@@ -171,7 +173,7 @@ class NoiseObserver(object):
         self.audio.terminate()
 
         # If record flag was specified we need to clean buffer.
-        if self.record:
+        if self.record_thr:
             # Write last data on file.
             self.audio_writer.buffer_fflush()
 
@@ -223,6 +225,30 @@ class NoiseObserver(object):
             self.data_stats['max'] = dbSPL
             self.data_stats['avg'] = dbSPL
 
+    def record_action(self, dbSPL):
+        """
+            Decide if start record checking values of record window.
+        """
+        self.window[0, self.value_index] = dbSPL
+        self.value_index =  int((self.value_index + 1) % self.window_size)
+        #print("\n" + str(self.value_index))
+
+        # Calculate average noise level.
+        # See: https://www.cirrusresearch.co.uk/blog/2013/01/noise-data-averaging-how-do-i-average-noise-measurements/
+        average_mean = self.window / 10
+        average_mean = 10 ** average_mean
+        mean = np.sum(average_mean) / 10
+        mean = 10 * np.log10(mean)
+        print("Media: " + str(mean))
+
+        # If average noise level is upper then threshold register.
+        if mean >= self.record_thr:
+            print("Accumulo dati sopra la media")
+            self.audio_writer.write(self.recorded_frames.copy())
+        else:
+            print("Non accumulo")
+            self.audio_writer.clear_buffer()
+
     def setup_log(self):
         """
             Method used to setup log on text file.
@@ -231,7 +257,7 @@ class NoiseObserver(object):
             filename = self.log.name, # Name of the file passed by CLI.
             format = "%(asctime)s %(message)s", # Format date_time data.
             level = logging.INFO)
-        self.file_logger = logging.getLogger(__name__) # Get logger personalized logger.
+        self.file_logger = logging.getLogger(__name__) # Get personalized logger.
 
     def setup_record(self):
         """
@@ -239,7 +265,12 @@ class NoiseObserver(object):
         """
         # Create audio file used as base to record.
         self.record_dir = create_audio_dir()
-        self.audio_writer = BufferedWriter(self.format, self.record, self.audio, self.record_dir)
+        self.audio_writer = BufferedWriter(self.format, self.audio, self.record_dir)
+        self.window_size = int(self.SEC // self.config_manager.AUDIO_SEGMENT_LENGTH)
+
+        # Init value of window setted ro 30db (min value recorded).
+        self.window = np.full((1, self.window_size), 30.0) #[30 for _ in range(self.window_size)]
+        self.value_index = 0
 
     def convert_to_spl(self, rms):
         """

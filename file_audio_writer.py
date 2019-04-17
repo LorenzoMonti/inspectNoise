@@ -10,7 +10,7 @@ from io import BytesIO
 
 class FileAudioWriter(Thread):
 
-    def __init__(self, queue, format, file, audio, record_dir):
+    def __init__(self, queue, format, audio, record_dir):
         """
             Constructor.
             :queue: global queue used to communicate with buffered writer.
@@ -21,7 +21,6 @@ class FileAudioWriter(Thread):
         Thread.__init__(self)
         self.queue = queue
         self.format = format
-        self.file = file
         self.recorder = BytesIO()
 
         self.config = ConfigManager()

@@ -10,13 +10,13 @@ class BufferedWriter(object):
     SIZE = 500
     frames = []
 
-    def __init__(self, format, file_name, audio, record_dir):
+    def __init__(self, format, audio, record_dir):
         """
             Constructor for this class.
         """
         self.buffer = StringIO()
         self.queue = Queue()
-        self.worker = FileAudioWriter(self.queue, format, file_name, audio, record_dir)
+        self.worker = FileAudioWriter(self.queue, format, audio, record_dir)
         self.worker.daemon = True
         self.worker.start()
 
@@ -73,6 +73,14 @@ class BufferedWriter(object):
         #self.c+=1
         #self.buffer = StringIO() # Creating a new buffer.
 
+    def clear_buffer(self):
+        """
+            Method used to clear buffer after that decibels are lower then threshold.
+        """
+        if len(self.frames) > 0:
+            print("\n\tclear")
+            self.queue.put(self.frames.copy())
+            self.frames.clear()
 
     def buffer_fflush(self):
         """
@@ -85,9 +93,9 @@ class BufferedWriter(object):
 
             # Waits until the queue is empty
         #    self.queue.join()
-        print("\n\tfflush")
 
         # Flush buffer data.
         if len(self.frames) > 0:
+            print("\n\tfflush")
             self.queue.put(self.frames.copy())
             self.queue.join()

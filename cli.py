@@ -13,9 +13,10 @@ def parse_arguments():
                         const=USER_LOGFILE, # used to create file if user don't specify filename.
                         help="Write data on file as text")
     parser.add_argument('-r', '--record',
-                        action="store_true",
+                        #action="store_true",
+                        type=int,
                         #const=USER_RECORDFILE, # used to create file if user don't specify filename.
-                        help="Write data on files as audio")
+                        help="Write data upper than threshold on files as audio")
     parser.add_argument('-s', '--seconds',
                         type=int,
                         help="Time during record data")
@@ -61,6 +62,9 @@ def parse_arguments():
         if args.format not in ['mp3', 'ogg', 'wav']: # possible formats.
             raise parser.error("Insert standard format {} !".format("mp3 - wav - ogg"))
 
+    if args.record:
+        if args.record < 30 or args.record > 130:
+            raise parser.error("Threshold must be in 30-130 dB range")
     #if args.bitrate:
     #    if args.bitrate not in [128, 256, 320]: # possible bitrates.
     #        raise parser.error("Insert standard bitrate 128 - 256 - 320 !")
