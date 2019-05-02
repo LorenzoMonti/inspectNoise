@@ -239,14 +239,14 @@ class NoiseObserver(object):
         average_mean = 10 ** average_mean
         mean = np.sum(average_mean) / 10
         mean = 10 * np.log10(mean)
-        print("Media: " + str(mean))
+        #print("Media: " + str(mean))
 
         # If average noise level is upper then threshold register.
         if mean >= self.record_thr:
-            print("Accumulo dati sopra la media")
+            #print("Accumulo dati sopra la media")
             self.audio_writer.write(self.recorded_frames.copy())
         else:
-            print("Non accumulo")
+            #print("Non accumulo")
             self.audio_writer.clear_buffer()
 
     def setup_log(self):

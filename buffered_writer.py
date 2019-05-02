@@ -63,7 +63,7 @@ class BufferedWriter(object):
         # If list reached max size, put data in a thread buffer for
         # writing on audio file.
         if len(self.frames) >= self.SIZE:
-            print("\n\tBuffer overflow.")
+            #print("\n\tBuffer overflow.")
             self.queue.put(self.frames.copy())
             self.frames.clear()
             #del self.frames[:]
@@ -78,7 +78,7 @@ class BufferedWriter(object):
             Method used to clear buffer after that decibels are lower then threshold.
         """
         if len(self.frames) > 0:
-            print("\n\tclear")
+            #print("\n\tclear")
             self.queue.put(self.frames.copy())
             self.frames.clear()
 
@@ -96,6 +96,6 @@ class BufferedWriter(object):
 
         # Flush buffer data.
         if len(self.frames) > 0:
-            print("\n\tfflush")
+            #print("\n\tfflush")
             self.queue.put(self.frames.copy())
             self.queue.join()

@@ -51,7 +51,7 @@ class FileAudioWriter(Thread):
         # Write merged audio segment on file.
         #merged.export(self.file, format=self.format)
         #new_data.export(fname, format=self.format)
-        print("\n\tPrinting on file")
+        #print("\n\tPrinting on file")
         # StringIO passed as first param to write into memory buffer.
         w = wave.open(self.recorder, 'wb')
 
