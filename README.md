@@ -8,6 +8,7 @@ To know available flags use:
         python3 inspect_noise --help
 
 Flags:
+
     - -c/ --collect: collect data as Min, Max and Avg.
 
     - -l/--log [file]: log of recorded data as text file. [file] is an optional params, if not specified, program will save log on a file (name: log.log) in ~/.inspectNoise/ hidden folder.
