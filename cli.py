@@ -21,7 +21,7 @@ def parse_arguments():
                         type=int,
                         help="Time during record data")
     parser.add_argument('-ca', '--calibrate', action="store_true",
-                        help="Calibrate input audio device")
+                        help="Calibrate measurements of input audio device")
     parser.add_argument('-sh', '--showindex', action="store_true",
                         help="Show input device index")
     parser.add_argument('-se', '--setindex', type=int,
@@ -37,8 +37,8 @@ def parse_arguments():
 
     args = parser.parse_args()
 
-    if args.calibrate and (args.log or args.record or args.seconds or args.collect or args.showindex or args.setindex or args.format or args.trashesoutput):
-        raise parser.error("Calibrate flag can't be used with others flags")
+    #if args.calibrate and (args.log or args.record or args.seconds or args.collect or args.showindex or args.setindex or args.format or args.trashesoutput):
+    #    raise parser.error("Calibrate flag can't be used with others flags")
 
     if args.showindex and (args.log or args.record or args.seconds or args.collect or args.calibrate or args.setindex or args.format or args.trashesoutput):
         raise parser.error("Show index flag can't be used with others flags")

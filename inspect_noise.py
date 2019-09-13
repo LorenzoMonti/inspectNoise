@@ -25,9 +25,9 @@ def main():
         show_device_index_list()
     elif kargs['setindex'] != None: # If kargs['setindex'] is 0 condition is false withut != None.
         conf_manager.write_device_index('input_device_index', kargs['setindex'])
-    elif kargs['calibrate']:
-        # Call to start calibration function
-        pass
+    #elif kargs['calibrate']:
+    #    # Call to start calibration function
+    #    pass
     else:
 
         # Register signal handlers.
@@ -36,7 +36,6 @@ def main():
 
         del kargs['showindex']
         del kargs['setindex']
-        del kargs['calibrate']
         _noise_observer = NoiseObserver(**kargs)
         _noise_observer.start_monitoring()
 

@@ -6,6 +6,7 @@ import wave
 import signal
 import time
 import sys
+import pickle
 import numpy as np
 from config_manager import ConfigManager
 from io import BytesIO as StringIO
@@ -18,7 +19,8 @@ class NoiseObserver(object):
 
     def __init__ (self, seconds = None, log = None,
                   collect = False, record = None,
-                  format = None, trashesoutput = False):
+                  format = None, trashesoutput = False,
+                  calibrate = False):
         """
             :seconds: if flag was set it is the number of seconds when we need to monitor noise.
             :log: if flag is set, it represent name of log file.
@@ -34,6 +36,7 @@ class NoiseObserver(object):
         self.collect = collect
         self.record_thr = record
         self.trashes = trashesoutput
+        self.calibrate = calibrate
 
         #if not bitrate:
         #    self.bitrate = 256 # Default value.
@@ -76,6 +79,8 @@ class NoiseObserver(object):
             self.data_stats = dict()
         if self.record_thr:
             self.setup_record()
+        if self.calibrate:
+            self.setup_calibration()
 
     @coroutine
     def record_generator(self):
@@ -150,6 +155,10 @@ class NoiseObserver(object):
 
             dbSPL = self.convert_to_spl(segment.rms) # Convert rms in dbSPL.
 
+            # First of all if the calibration flag is set, then the measurement must be passed
+            # to the model for the prediction of the calibrated decibels.
+            if self.calibrate:
+                dbSPL = self.model.predict([[dbSPL]])
             if self.collect:
                 self.collect_data(dbSPL)
             if self.log:
@@ -271,6 +280,13 @@ class NoiseObserver(object):
         # Init value of window setted ro 30db (min value recorded).
         self.window = np.full((1, self.window_size), 30.0) #[30 for _ in range(self.window_size)]
         self.value_index = 0
+
+    def setup_calibration(self):
+        """
+            Method used to load machine learning model for calibration.
+        """
+        with open("calibration/model.bin", "rb") as f:
+            self.model = pickle.load(f)
 
     def convert_to_spl(self, rms):
         """
