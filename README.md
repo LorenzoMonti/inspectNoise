@@ -27,7 +27,7 @@ To know available flags use:
 | `-se/--setindex index` | used to set index of input microphone (writing on configuration file) |
 | `-f/--format [mp3, wav, ogg]` | define format of output record. It can be used only with --record |
 | `-to/--thrashesoutput` | used for debug or utility, when specified permit to not show output on terminal |
-| `-ca/--calibrate` | To be implemented |
+| `-ca/--calibrate` | used to load machine learning model that try to predict db read by a calibrated phonometer. The calibration tries to predict the values read by the [UT351/352] (the calibration tries to predict the read values of the UT321 sound level meter) sound level meter |
 
 ## Extension
 
@@ -50,6 +50,17 @@ In the project directory are included 2 more utils file.
 ```bash
         python3 audio_merger.py input_dir_path export_file format
 ```
+
+## Created Dataset
+
+Using this library for the environmental noise monitoring with a microphone and a SPL meter three different datasets were created.
+The following datasets are located in subdirectory named "dataset" and stored in simple csv files.
+
+1. __DB_dataset_first_model.csv__. This dataset contains microphone and SPL meter samples corresponding to the same second.
+2. __DB_dataset_canarin_second_model.csv__.  This dataset contains microphone, SPL meter and environmental (like temperature, humidity, pression, PM ecc.) samples corresponding to the same second.
+3. __DB_dataset_canarin_third_model.csv__. This dataset contains microphone, SPL meter and environmental (like temperature, humidity, pression, PM ecc.) samples corresponding to the same minute.
+
+In the first and second datasets are used data from a month of sampling, while in the third are used two months' data.
 
 ## License
 

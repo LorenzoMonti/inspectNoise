@@ -2,7 +2,6 @@
 *.log
 *.mp3
 *.ogg
-*.zip
 *.rar
 *.pyc
 __pycache__/

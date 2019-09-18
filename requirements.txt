@@ -3,3 +3,4 @@ pyaudio
 pydub
 six
 numpy
+scikit-learn
