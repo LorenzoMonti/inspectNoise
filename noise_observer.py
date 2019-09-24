@@ -158,7 +158,7 @@ class NoiseObserver(object):
             # First of all if the calibration flag is set, then the measurement must be passed
             # to the model for the prediction of the calibrated decibels.
             if self.calibrate:
-                dbSPL = self.model.predict([[dbSPL]])
+                dbSPL = self.model.predict([[dbSPL]])[0]
             if self.collect:
                 self.collect_data(dbSPL)
             if self.log:
@@ -285,7 +285,7 @@ class NoiseObserver(object):
         """
             Method used to load machine learning model for calibration.
         """
-        with open("calibration/model.bin", "rb") as f:
+        with open("/home/pi/inspectNoise/calibration/model.bin", "rb") as f:
             self.model = pickle.load(f)
 
     def convert_to_spl(self, rms):
