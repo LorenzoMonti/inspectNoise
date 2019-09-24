@@ -29,7 +29,7 @@ To know available flags use:
 | `-to/--thrashesoutput` | used for debug or utility, when specified permit to not show output on terminal |
 | `-ca/--calibrate` | used to load machine learning model that try to predict db read by a calibrated phonometer. The calibration tries to predict the values read by the [UT351/352] (the calibration tries to predict the read values of the UT321 sound level meter) sound level meter |
 
-##Note
+## Note
 
 Please pay attention when use --calibrate flag, because, as reported in requirements.txt file, in our Raspberry the version of scikit-learn is 0.21.3, and the model was printed using the same version of this library.
 
