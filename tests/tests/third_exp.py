@@ -34,8 +34,8 @@ def models(dataset_canarin_minutes):
     lrm.fit(X_train, y_train)
     util.print_error_stats(X_val, y_val, lrm)
     pd.Series(lrm.coef_, index=X_train.columns)
-    print("   RMSE: ", np.sqrt(mean_squared_error(y_val, lrm.predict(y_val, lrm.predict(X_val))))
-    
+    print("   RMSE: ", np.sqrt(mean_squared_error(y_val, lrm.predict(X_val))))
+
     print("Polynomial Regression")
     poly = Pipeline([
         ("poly",   PolynomialFeatures(degree=2, include_bias=False)),
@@ -44,7 +44,7 @@ def models(dataset_canarin_minutes):
     ])
     poly.fit(X_train, y_train)
     util.print_error_stats(X_val, y_val, poly)
-    print("   RMSE: ", np.sqrt(mean_squared_error(y_val, lrm.predict(y_val, poly.predict(X_val))))
+    print("   RMSE: ", np.sqrt(mean_squared_error(y_val, poly.predict(X_val))))
 
     print("Polynomial Regression with Ridge")
     model = Pipeline([
@@ -117,3 +117,4 @@ def models(dataset_canarin_minutes):
     #y_val[10567]
     #predicted[10567]
     
+
