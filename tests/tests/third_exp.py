@@ -34,6 +34,7 @@ def models(dataset_canarin_minutes):
     lrm.fit(X_train, y_train)
     util.print_error_stats(X_val, y_val, lrm)
     pd.Series(lrm.coef_, index=X_train.columns)
+    print("   RMSE: ", np.sqrt(mean_squared_error(y_val, lrm.predict(y_val, lrm.predict(X_val))))
     
     print("Polynomial Regression")
     poly = Pipeline([
@@ -43,6 +44,7 @@ def models(dataset_canarin_minutes):
     ])
     poly.fit(X_train, y_train)
     util.print_error_stats(X_val, y_val, poly)
+    print("   RMSE: ", np.sqrt(mean_squared_error(y_val, lrm.predict(y_val, poly.predict(X_val))))
 
     print("Polynomial Regression with Ridge")
     model = Pipeline([
@@ -64,7 +66,7 @@ def models(dataset_canarin_minutes):
     ])
 
     grid_poly = {
-        "poly__degree": range(1, 51),
+        "poly__degree": range(1, 21),
     }
 
     gs = GridSearchCV(model_poly, param_grid=grid_poly)
@@ -80,7 +82,7 @@ def models(dataset_canarin_minutes):
     ])
 
     grid = {
-        "poly__degree": range(1, 51),
+        "poly__degree": range(1, 21),
         "regr__alpha": [0.1, 1, 10]
     }
 
