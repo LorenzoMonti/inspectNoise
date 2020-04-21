@@ -12,4 +12,4 @@ if __name__ == "__main__":
     ###############################################################
     first_exp.models(dataset)
     second_exp.models(dataset_canarin_seconds)
-    third_exp.models(dataset_canarin_minutes) 
+    third_exp.models(dataset_canarin_minutes)

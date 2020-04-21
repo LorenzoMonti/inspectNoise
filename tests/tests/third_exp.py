@@ -17,46 +17,55 @@ from sklearn.ensemble import GradientBoostingRegressor
 import util
 
 def models(dataset_canarin_minutes):
-    # ## Costruzione Modelli
-    #
-    # - Ora andiamo a costruire i modelli di leaerning sul dataset appena costruito.
-    # - Per prima cosa dobbiamo andare a dividere l'insieme di dati in __Training Set__ e __Validation Set__.
+    # - Method 3: Prediction of decibels calibrated starting from those of the microphone and from the environmental data of the canary - using a frequency per minute.
+
+    # - Split the dataset
     X_train, X_val, y_train, y_val = train_test_split(
         dataset_canarin_minutes.drop("db_phon", axis=1),    # X = tutto tranne db_phon
         dataset_canarin_minutes["db_phon"],                 # y = db_phon
         test_size=1/3, random_state=42                      # parametri divisione
     )
 
-    # - Anche in questo ultimo caso si tratta di __Regressione Multivariata__.
-    # - Partiamo con l'addestramento di un semplice modello lineare.
-    print("Linear Regression")
+    # - Linear regression. (__multivariate__ regression)
+    print("Linear regression")
     lrm = LinearRegression()
     lrm.fit(X_train, y_train)
+
+    # - Print out the error metrics
     util.print_error_stats(X_val, y_val, lrm)
+    print("   RMSE: ", np.sqrt(mean_squared_error(y_val, lrm.predict(X_val))))
+
     pd.Series(lrm.coef_, index=X_train.columns)
-    
-    print("Polynomial Regression")
+
+    # - Polynomial regression
+    print("Polynomial regression")
     poly = Pipeline([
         ("poly",   PolynomialFeatures(degree=2, include_bias=False)),
         ("scale",  StandardScaler()),
         ("linreg", LinearRegression())
     ])
     poly.fit(X_train, y_train)
-    util.print_error_stats(X_val, y_val, poly)
 
-    print("Polynomial Regression with Ridge")
+    # - Print out the error metrics
+    util.print_error_stats(X_val, y_val, poly)
+    print("   RMSE: ", np.sqrt(mean_squared_error(y_val, poly.predict(X_val))))
+
+    # - Polynomial regression with Ridge
+    print("Polynomial regression with Ridge")
     model = Pipeline([
         ("scale", StandardScaler()),
         ("poly",  PolynomialFeatures(degree=2, include_bias=False)),
         ("regr",  Ridge(alpha=0.5))
     ])
     model.fit(X_train, y_train)
+
+    # - Print out the error metrics
     util.print_error_stats(X_val, y_val, model)
     print("   RMSE: ", np.sqrt(mean_squared_error(y_val, model.predict(X_val))))
-    
-    # - Ora andiamo ad eseguire la __Grid Search__ per trovare i valori degli iperparametri che permettono di ottenere una maggiore accuratezza.
-    # - Teniamo conto del fatto che avendo molti meno dati possiamo aumentare maggiormente il grado del polinomio.
-    print("Polynomial Regression with GridSearch")
+
+    # - Polynomial regression with GridSearch
+    # - With less data it is possible to increase the polynomial degrees
+    print("Polynomial regression with GridSearch")
     model_poly = Pipeline([
         ("poly",   PolynomialFeatures(include_bias=False)),
         ("scale",  StandardScaler()),
@@ -64,15 +73,18 @@ def models(dataset_canarin_minutes):
     ])
 
     grid_poly = {
-        "poly__degree": range(1, 51),
+        "poly__degree": range(1, 15),
     }
 
     gs = GridSearchCV(model_poly, param_grid=grid_poly)
     gs.fit(X_train, y_train)
+
+    # - Print out the error metrics
     util.print_error_stats(X_val, y_val, gs)
-    print("   RMSE: ", np.sqrt(mean_squared_error(y_val, model.predict(X_val))))
-   
-    print("Polynomial Regression with Ridge and GridSearch")
+    print("   RMSE: ", np.sqrt(mean_squared_error(y_val, gs.predict(X_val))))
+
+    # - Polynomial regression with Ridge and GridSearch
+    print("Polynomial regression with Ridge and GridSearch")
     model = Pipeline([
         ("scale", StandardScaler()),
         ("poly",  PolynomialFeatures(include_bias=False)),
@@ -80,16 +92,20 @@ def models(dataset_canarin_minutes):
     ])
 
     grid = {
-        "poly__degree": range(1, 51),
+        "poly__degree": range(1, 15),
         "regr__alpha": [0.1, 1, 10]
     }
 
     gs = GridSearchCV(model, param_grid=grid)
     gs.fit(X_train, y_train)
+
     print(pd.DataFrame(gs.cv_results_).sort_values("mean_test_score", ascending=False).head())
+
+    # - Print out the error metrics
     util.print_error_stats(X_val, y_val, gs)
-    
-    # - Infine, avendo ottenuto ottimi risultati nei casi precedenti, utilizziamo le __Random Forest__.
+    print("   RMSE: ", np.sqrt(mean_squared_error(y_val, gs.predict(X_val))))
+
+    # - Random Forest
     print("Random Forest")
     model_rf = Pipeline([
         ("scaler", StandardScaler()),
@@ -103,15 +119,13 @@ def models(dataset_canarin_minutes):
     gs_rf = GridSearchCV(model_rf, param_grid=grid_rf)
     gs_rf.fit(X_train, y_train)
     print(pd.DataFrame(gs_rf.cv_results_).sort_values("mean_test_score", ascending=False))
+
+    # - Print out the error metrics
     util.print_error_stats(X_val, y_val, gs_rf)
     print("   RMSE: ", np.sqrt(mean_squared_error(y_val, gs_rf.predict(X_val))))
 
-    # - Anche in questo caso, il modello a produrre risultati migliori è quello che utilizza le __Random Forest__.
-    # - Di seguito vengono riportati alcuni esempi di predizioni.
-    #     - Da questi è possibile notare che l'errore eseguito è mediamente quello del modello testato sul validation set, ovvero quello riportato dalla metrica.
     predicted = gs_rf.predict(X_val)
     #y_val[122]
     #predicted[122]
     #y_val[10567]
     #predicted[10567]
-    
