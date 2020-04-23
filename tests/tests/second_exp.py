@@ -36,7 +36,6 @@ def models(dataset_canarin_seconds):
     lrm.fit(X_train, y_train)
     # - Print out the error metrics
     util.print_error_stats(X_val, y_val, lrm)
-    print("   RMSE: ", np.sqrt(mean_squared_error(y_val, lrm.predict(X_val))))
 
     # - The value of the coefficients attributed by the model to the individual features to understand which ones are most important.
     print(pd.Series(lrm.coef_, index=X_train.columns))
@@ -51,7 +50,6 @@ def models(dataset_canarin_seconds):
 
     # - Print out the error metrics
     util.print_error_stats(X_val, y_val, model)
-    print("   RMSE: ", np.sqrt(mean_squared_error(y_val, lrm.predict(X_val))))
     print(pd.Series(model.named_steps["linreg"].coef_, index=X_train.columns))
 
     # - Polynomial regression
@@ -65,7 +63,6 @@ def models(dataset_canarin_seconds):
 
     # - Print out the error metrics
     util.print_error_stats(X_val, y_val, model)
-    print("   RMSE: ", np.sqrt(mean_squared_error(y_val, model.predict(X_val))))
 
 
     # - Regularization with __Ridge__
@@ -79,7 +76,6 @@ def models(dataset_canarin_seconds):
 
     # - Print out the error metrics
     util.print_error_stats(X_val, y_val, model)
-    print("   RMSE: ", np.sqrt(mean_squared_error(y_val, model.predict(X_val))))
 
     # - Regularization with __Elastic Net__, (hybrid between Ridge and Lasso)
     print("Polynomial regression with ElasticNet")
@@ -92,7 +88,6 @@ def models(dataset_canarin_seconds):
 
     # - Print out the error metrics
     util.print_error_stats(X_val, y_val, model)
-    print("   RMSE: ", np.sqrt(mean_squared_error(y_val, model.predict(X_val))))
 
     # - We have tested some of the main models and understood which of these lead to a drop in the error,
     # let's perform the tuning of the hyperparameters using __Grid Search__.
@@ -113,7 +108,6 @@ def models(dataset_canarin_seconds):
     print(pd.DataFrame(gs.cv_results_).sort_values("mean_test_score", ascending=False))
     # - Print out the error metrics
     util.print_error_stats(X_val, y_val, gs)
-    print("   RMSE: ", np.sqrt(mean_squared_error(y_val, gs.predict(X_val))))
 
     # - Polynomial regression with Ridge and GridSearch
     print("Polynomial regression with Ridge and GridSearch")
@@ -131,7 +125,6 @@ def models(dataset_canarin_seconds):
 
     # - Print out the error metrics
     util.print_error_stats(X_val, y_val, gs)
-    print("   RMSE: ", np.sqrt(mean_squared_error(y_val, gs.predict(X_val))))
 
 
     # - Random Forest
@@ -149,7 +142,6 @@ def models(dataset_canarin_seconds):
     gs_rf.fit(X_train, y_train)
     print(pd.DataFrame(gs_rf.cv_results_).sort_values("mean_test_score", ascending=False))
     util.print_error_stats(X_val, y_val, gs_rf)
-    print("   RMSE: ",np.sqrt(mean_squared_error(y_val, gs_rf.predict(X_val))))
 
 
     # - Gradient Boosting
@@ -169,4 +161,3 @@ def models(dataset_canarin_seconds):
 
     # - Print out the error metrics
     util.print_error_stats(X_val, y_val, gs_gb)
-    print("   RMSE: ",np.sqrt(mean_squared_error(y_val, gs_gb.predict(X_val))))

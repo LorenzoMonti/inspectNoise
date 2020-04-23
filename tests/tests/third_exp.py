@@ -33,7 +33,6 @@ def models(dataset_canarin_minutes):
 
     # - Print out the error metrics
     util.print_error_stats(X_val, y_val, lrm)
-    print("   RMSE: ", np.sqrt(mean_squared_error(y_val, lrm.predict(X_val))))
 
     pd.Series(lrm.coef_, index=X_train.columns)
 
@@ -48,7 +47,6 @@ def models(dataset_canarin_minutes):
 
     # - Print out the error metrics
     util.print_error_stats(X_val, y_val, poly)
-    print("   RMSE: ", np.sqrt(mean_squared_error(y_val, poly.predict(X_val))))
 
     # - Polynomial regression with Ridge
     print("Polynomial regression with Ridge")
@@ -61,7 +59,6 @@ def models(dataset_canarin_minutes):
 
     # - Print out the error metrics
     util.print_error_stats(X_val, y_val, model)
-    print("   RMSE: ", np.sqrt(mean_squared_error(y_val, model.predict(X_val))))
 
     # - Polynomial regression with GridSearch
     # - With less data it is possible to increase the polynomial degrees
@@ -81,7 +78,6 @@ def models(dataset_canarin_minutes):
 
     # - Print out the error metrics
     util.print_error_stats(X_val, y_val, gs)
-    print("   RMSE: ", np.sqrt(mean_squared_error(y_val, gs.predict(X_val))))
 
     # - Polynomial regression with Ridge and GridSearch
     print("Polynomial regression with Ridge and GridSearch")
@@ -103,7 +99,6 @@ def models(dataset_canarin_minutes):
 
     # - Print out the error metrics
     util.print_error_stats(X_val, y_val, gs)
-    print("   RMSE: ", np.sqrt(mean_squared_error(y_val, gs.predict(X_val))))
 
     # - Random Forest
     print("Random Forest")
@@ -122,7 +117,6 @@ def models(dataset_canarin_minutes):
 
     # - Print out the error metrics
     util.print_error_stats(X_val, y_val, gs_rf)
-    print("   RMSE: ", np.sqrt(mean_squared_error(y_val, gs_rf.predict(X_val))))
 
     predicted = gs_rf.predict(X_val)
     #y_val[122]

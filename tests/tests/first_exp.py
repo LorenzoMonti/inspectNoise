@@ -13,6 +13,8 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import Ridge
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.svm import SVR
+from sklearn.model_selection import ShuffleSplit
 import util
 
 def models(dataset):
@@ -35,7 +37,6 @@ def models(dataset):
 
     # - Print out the error metrics.
     util.print_error_stats(X_val, y_val, lrm)
-    print("   RMSE: ", np.sqrt(mean_squared_error(y_val, lrm.predict(X_val))))
 
     # - Plot data
     util.plot_model_on_data(X_train, y_train, lrm)
@@ -58,7 +59,6 @@ def models(dataset):
 
     prm.fit(X_train, y_train)
     util.print_error_stats(X_val, y_val, prm)
-    print("   RMSE: ",np.sqrt(mean_squared_error(y_val, prm.predict(X_val))))
 
     # - Testing all combinations manually would be of little unuseless and expensive in terms of times, which is why we can use the __Grid Search__.
     # The __Grid Search__ allows us to set different values for each hyperparameter and then train a separate model for each possible combination
@@ -85,8 +85,6 @@ def models(dataset):
     print(pd.DataFrame(gs.cv_results_).sort_values("rank_test_score").head(50))
     # - Print out the error metrics
     util.print_error_stats(X_val, y_val, gs)
-    print("   RMSE: ",np.sqrt(mean_squared_error(y_val, gs.predict(X_val))))
-
 
     # - We can expect that as the degree increases then the error continues to decrease, until it goes to __Overfitting__, to avoid this problem we can use __Regularization__
     # This technique allows to continue with the increase of the degree of the polynomial and the consequent complexity of the model, while avoiding the problem of __Overfitting__.
@@ -109,7 +107,6 @@ def models(dataset):
     print(pd.DataFrame(gs.cv_results_).sort_values("rank_test_score").head(50))
     # - Print out the error metrics
     util.print_error_stats(X_val, y_val, gs)
-    print("   RMSE: ",np.sqrt(mean_squared_error(y_val, gs.predict(X_val))))
 
     # - Testing some values using the validation set
     predicted = gs.predict(X_val)
@@ -137,6 +134,22 @@ def models(dataset):
     print(pd.DataFrame(gs_lrf.cv_results_).sort_values("rank_test_score").head(140))
     # - Print out the error metrics
     util.print_error_stats(X_val, y_val, gs_lrf)
-    print("   RMSE: ",np.sqrt(mean_squared_error(y_val, gs_lrf.predict(X_val))))
+
     # - Plot data
     util.plot_model_on_data(X_train, y_train, gs_lrf)
+
+    # - SVR
+    print("Support Vector Regression")
+
+    grid_svr = {
+        'kernel': ['linear'],
+        'C': [1e0, 1e1, 1e2, 1e3],
+        'gamma': np.logspace(-2, 2, 5)
+    }
+
+    #set up tuning algorithm
+    gs_svr = GridSearchCV(SVR(), param_grid=grid_svr)
+    #fit the classifier
+    gs_svr.fit(X_train, y_train)
+    util.print_error_stats(X_val, y_val, gs_svr)
+    util.plot_model_on_data(X_train, y_train, gs_svr)

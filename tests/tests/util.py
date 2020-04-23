@@ -66,8 +66,10 @@ def relative_error(y_true, y_pred):
 # - Print MSE, relative error and R^2 errors
 def print_error_stats(X, y, model):
     print("   Mean squared error: {:.5}".format(mean_squared_error(model.predict(X), y)))
+    print("   Root Mean squared error: {:.5}".format(np.sqrt(mean_squared_error(model.predict(X), y))))
     print("   Relative error: {:.5%}".format(relative_error(model.predict(X), y)))
     print("   R-squared coefficient: {:.5}".format(model.score(X, y)))
+
 
 # - Plot data
 def plot_model_on_data(x, y, model=None):
@@ -80,3 +82,4 @@ def plot_model_on_data(x, y, model=None):
         plt.xlim(xlim); plt.ylim(ylim)
     plt.grid()
     plt.xlabel("db_microphone"); plt.ylabel("db_phonometer")
+    #plt.show()
