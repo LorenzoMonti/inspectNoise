@@ -39,7 +39,7 @@ def models(dataset):
     util.print_error_stats(X_val, y_val, lrm)
 
     # - Plot data
-    util.plot_model_on_data(X_train, y_train, lrm)
+    util.plot_model_on_data(X_train, y_train, lrm, "LinearRegression")
 
     # - Testing the prediction on some values.
     predicted = lrm.predict(X_val)
@@ -115,7 +115,7 @@ def models(dataset):
     #print(predicted[100])
     #print(y_val[100])
     # - Plot data
-    util.plot_model_on_data(X_train, y_train, gs)
+    util.plot_model_on_data(X_train, y_train, gs, "Poly regression with Ridge and GRID")
 
     # - Random Forest
     print("Random Forest")
@@ -136,7 +136,7 @@ def models(dataset):
     util.print_error_stats(X_val, y_val, gs_lrf)
 
     # - Plot data
-    util.plot_model_on_data(X_train, y_train, gs_lrf)
+    util.plot_model_on_data(X_train, y_train, gs_lrf, "Random Forest")
 
     # - SVR
     print("Support Vector Regression")
@@ -152,4 +152,4 @@ def models(dataset):
     #fit the classifier
     gs_svr.fit(X_train, y_train)
     util.print_error_stats(X_val, y_val, gs_svr)
-    util.plot_model_on_data(X_train, y_train, gs_svr)
+    util.plot_model_on_data(X_train, y_train, gs_svr, "SVR")

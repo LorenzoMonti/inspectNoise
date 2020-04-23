@@ -72,7 +72,7 @@ def print_error_stats(X, y, model):
 
 
 # - Plot data
-def plot_model_on_data(x, y, model=None):
+def plot_model_on_data(x, y, model=None, filename="DefaultFigure"):
     plt.scatter(x, y)
     if model is not None:
         xlim, ylim = plt.gca().get_xlim(), plt.gca().get_ylim()
@@ -82,4 +82,5 @@ def plot_model_on_data(x, y, model=None):
         plt.xlim(xlim); plt.ylim(ylim)
     plt.grid()
     plt.xlabel("db_microphone"); plt.ylabel("db_phonometer")
+    plt.savefig(filename)
     #plt.show()
