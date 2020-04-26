@@ -7,13 +7,16 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from sklearn.linear_model import LinearRegression
-from sklearn.pipeline import Pipeline
+from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import Ridge
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import GradientBoostingRegressor
+from thundersvm import SVR
+from sklearn.svm import LinearSVR
+import time
 import util
 
 def models(dataset_canarin_minutes):
@@ -123,3 +126,37 @@ def models(dataset_canarin_minutes):
     #predicted[122]
     #y_val[10567]
     #predicted[10567]
+
+    # - SVR
+    print("Support Vector Regression (linear)")
+    grid_svr = {
+        #'kernel': ['linear'],
+        'C': [1e0, 1e1, 1e2, 1e3]
+        #'gamma': np.logspace(-2, 2, 5)
+    }
+
+    #X_train = X_train.iloc[:100000]
+    #y_train = y_train.iloc[:100000]
+    #X_val = X_val.iloc[:100000]
+    #y_val = y_val.iloc[:100000]
+    # - set up tuning algorithm
+    gs_svr = make_pipeline(StandardScaler(), GridSearchCV(LinearSVR(), param_grid=grid_svr, n_jobs=1))
+    # - fit the classifier
+    gs_svr.fit(X_train, y_train)
+    # - Print out the error metrics
+    util.print_error_stats(X_val, y_val, gs_svr)
+
+    print("Support Vector Regression (gaussian)")
+    grid_svr = {
+        'kernel': ['rbf'],
+        'C': [1e0, 1e1, 1e2, 1e3],
+        'gamma': np.logspace(-2, 2, 5)
+    }
+
+    # - set up tuning algorithm
+    gs_svr = make_pipeline(StandardScaler(), GridSearchCV(SVR(), param_grid=grid_svr, n_jobs=1))
+    # - fit the classifier
+    gs_svr.fit(X_train, y_train)
+    # -  Print out the error metrics
+    util.print_error_stats(X_val, y_val, gs_svr)
+
