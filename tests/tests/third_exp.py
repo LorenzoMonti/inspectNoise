@@ -116,6 +116,7 @@ def models(dataset_canarin_minutes):
 
     gs_rf = GridSearchCV(model_rf, param_grid=grid_rf)
     gs_rf.fit(X_train, y_train)
+    print(pd.DataFrame(gs_rf.best_estimator_.named_steps['model'].feature_importances_)) # features importances
     print(pd.DataFrame(gs_rf.cv_results_).sort_values("mean_test_score", ascending=False))
 
     # - Print out the error metrics
