@@ -66,6 +66,11 @@ The following datasets are located in subdirectory named "dataset" and stored in
 
 In the first and second datasets are used data from a month of sampling, while in the third are used two months' data.
 
+## Citation
+
+Monti, L.; Vincenzi, M.; Mirri, S.; Pau, G.; Salomoni, P. RaveGuard: A Noise Monitoring Platform Using Low-End Microphones and Machine Learning. Sensors 2020, 20, 5583. 
+[DOI](https://doi.org/10.3390/s20195583)
+
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
